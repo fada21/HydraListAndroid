@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.fada21.edslv;
-
-import android.app.Activity;
-import android.os.Bundle;
+package com.fada21.edslv.sample;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.android.expandingcells.R;
+import android.app.Activity;
+import android.os.Bundle;
+
+import com.fada21.edslv.CustomArrayAdapter;
+import com.fada21.edslv.ExpandingListView;
+import com.fada21.edslv.R;
+import com.fada21.edslv.R.id;
+import com.fada21.edslv.R.layout;
 
 /**
  * This activity creates a listview whose items can be clicked to expand and show
  * additional content.
- *
+ * 
  * In this specific demo, each item in a listview displays an image and a corresponding
  * title. These two items are centered in the default (collapsed) state of the listview's
  * item. When the item is clicked, it expands to display text of some varying length.
@@ -37,8 +41,8 @@ import com.example.android.expandingcells.R;
  */
 public class ExpadingDragableStickyListViewActivity extends Activity {
 
-    private final int CELL_DEFAULT_HEIGHT = 200;
-    private final int NUM_OF_CELLS = 30;
+    private final int         CELL_DEFAULT_HEIGHT = 200;
+    private final int         NUM_OF_CELLS        = 45;
 
     private ExpandingListView mListView;
 
@@ -47,26 +51,22 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ExpandableListItem[] values = new ExpandableListItem[] {
-                new ExpandableListItem("Chameleon", R.drawable.chameleon, CELL_DEFAULT_HEIGHT,
-                        getResources().getString(R.string.short_lorem_ipsum)),
-                new ExpandableListItem("Rock", R.drawable.rock, CELL_DEFAULT_HEIGHT,
-                        getResources().getString(R.string.medium_lorem_ipsum)),
-                new ExpandableListItem("Flower", R.drawable.flower, CELL_DEFAULT_HEIGHT,
-                        getResources().getString(R.string.long_lorem_ipsum)),
+        SampleListItem[] values = new SampleListItem[] {
+                new SampleListItem(SampleContents.CHAMELEON),
+                new SampleListItem(SampleContents.ROCK),
+                new SampleListItem(SampleContents.FLOWER)
         };
 
-        List<ExpandableListItem> mData = new ArrayList<ExpandableListItem>();
+        List<SampleListItem> mData = new ArrayList<SampleListItem>();
 
         for (int i = 0; i < NUM_OF_CELLS; i++) {
-            ExpandableListItem obj = values[i % values.length];
-            mData.add(new ExpandableListItem(obj.getTitle(), obj.getImgResource(),
-                    obj.getCollapsedHeight(), obj.getText()));
+            SampleListItem obj = values[i % values.length];
+            mData.add(new SampleListItem(obj.getSc()));
         }
 
         CustomArrayAdapter adapter = new CustomArrayAdapter(this, R.layout.list_view_item, mData);
 
-        mListView = (ExpandingListView)findViewById(R.id.main_list_view);
+        mListView = (ExpandingListView) findViewById(R.id.main_list_view);
         mListView.setAdapter(adapter);
         mListView.setDivider(null);
     }

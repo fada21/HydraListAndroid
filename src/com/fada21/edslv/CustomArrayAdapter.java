@@ -38,18 +38,18 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.expandingcells.R;
+import com.fada21.edslv.sample.SampleListItem;
 
 /**
  * This is a custom array adapter used to populate the listview whose items will
  * expand to display extra content in addition to the default display.
  */
-public class CustomArrayAdapter extends ArrayAdapter<ExpandableListItem> {
+public class CustomArrayAdapter extends ArrayAdapter<SampleListItem> {
 
-    private List<ExpandableListItem> mData;
+    private List<SampleListItem> mData;
     private int                      mLayoutViewResourceId;
 
-    public CustomArrayAdapter(Context context, int layoutViewResourceId, List<ExpandableListItem> data) {
+    public CustomArrayAdapter(Context context, int layoutViewResourceId, List<SampleListItem> data) {
         super(context, layoutViewResourceId, data);
         mData = data;
         mLayoutViewResourceId = layoutViewResourceId;
@@ -65,7 +65,7 @@ public class CustomArrayAdapter extends ArrayAdapter<ExpandableListItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        final ExpandableListItem object = mData.get(position);
+        final SampleListItem object = mData.get(position);
 
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
@@ -78,20 +78,22 @@ public class CustomArrayAdapter extends ArrayAdapter<ExpandableListItem> {
                 (AbsListView.LayoutParams.MATCH_PARENT, object.getCollapsedHeight());
         linearLayout.setLayoutParams(linearLayoutParams);
 
-        ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
         TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
+        ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
+        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
         TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
-        titleView.setText(object.getTitle());
+        titleView.setText(object.getSc().getName());
         imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), object.getImgResource(), null)));
-        textView.setText(object.getText());
+                .getResources(), object.getSc().getIconResId(), null)));
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
+                .getResources(), object.getSc().getIconResId(), null)));
+        textView.setText(getContext().getString(object.getSc().getTextResId()));
 
         convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT));
 
-        ExpandingLayout expandingLayout = (ExpandingLayout) convertView.findViewById(R.id
-                .expanding_layout);
+        ExpandingLayout expandingLayout = (ExpandingLayout) convertView.findViewById(R.id.expanding_layout);
         expandingLayout.setExpandedHeight(object.getExpandedHeight());
         expandingLayout.setSizeChangedListener(object);
 
