@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -69,7 +68,11 @@ public class ExpandingListView extends ListView {
         throw new UnsupportedOperationException("Must use adapter of ArrayAdapter<? extends ExpandableListItem>");
     }
 
-    public void setAdapter(ArrayAdapter<? extends ExpandableListItem> adapter) {
+    public ExpandableListAdapter<? extends ExpandableListItem> getExpandableAdapter() {
+        return (ExpandableListAdapter<? extends ExpandableListItem>) getAdapter();
+    }
+
+    public void setAdapter(ExpandableListAdapter<? extends ExpandableListItem> adapter) {
         super.setAdapter(adapter);
     }
 
@@ -87,9 +90,9 @@ public class ExpandingListView extends ListView {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView(view));
                         if (viewObject.isExpandble() && !viewObject.isExpanded()) {
-                            expandView(view);
+                            expandView(view, position, id);
                         } else {
-                            collapseView(view);
+                            collapseView(view, position, id);
                         }
                     }
                 };
@@ -184,8 +187,18 @@ public class ExpandingListView extends ListView {
      * It is important to note that the listview is disabled during the animation
      * because the scrolling behaviour is unpredictable if the bounds of the items
      * within the listview are not constant during the scroll.
+     * 
+     * 
+     * TODO describe position and id
+     * 
+     * @param view2
+     * 
+     * @param id
+     * @param position
      */
-    private void expandView(final View view) {
+    private void expandView(final View view, int position, long id) {
+        ExpandingLayout expandingLayout = getExpandableAdapter().getExpandingView(position, view);
+
         final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView
                 (view));
 
@@ -203,7 +216,6 @@ public class ExpandingListView extends ListView {
         }
 
         /* Update the layout so the extra content becomes visible. */
-        final View expandingLayout = view.findViewById(R.id.expanding_layout);
         expandingLayout.setVisibility(View.VISIBLE);
 
         /*
@@ -387,9 +399,15 @@ public class ExpandingListView extends ListView {
      * below the collapsing view are animated upwards.
      * 6. The extra text is faded out as its contents become visible throughout the
      * animation process.
+     * 
+     * 
+     * TODO add description
+     * 
+     * @param id
+     * @param position
      */
 
-    private void collapseView(final View view) {
+    private void collapseView(final View view, int position, long id) {
         final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition
                 (getPositionForView(view));
 

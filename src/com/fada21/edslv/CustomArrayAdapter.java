@@ -32,7 +32,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,15 +43,10 @@ import com.fada21.edslv.sample.SampleListItem;
  * This is a custom array adapter used to populate the listview whose items will
  * expand to display extra content in addition to the default display.
  */
-public class CustomArrayAdapter extends ArrayAdapter<SampleListItem> {
-
-    private List<SampleListItem> mData;
-    private int                      mLayoutViewResourceId;
+public class CustomArrayAdapter extends ExpandableListAdapter<SampleListItem> {
 
     public CustomArrayAdapter(Context context, int layoutViewResourceId, List<SampleListItem> data) {
         super(context, layoutViewResourceId, data);
-        mData = data;
-        mLayoutViewResourceId = layoutViewResourceId;
     }
 
     /**
@@ -80,18 +74,29 @@ public class CustomArrayAdapter extends ArrayAdapter<SampleListItem> {
 
         TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
         ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
-        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
-        TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
         titleView.setText(object.getSc().getName());
         imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
                 .getResources(), object.getSc().getIconResId(), null)));
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), object.getSc().getIconResId(), null)));
-        textView.setText(getContext().getString(object.getSc().getTextResId()));
+
+        if (object.isExpandble()) {
+            ExpandingLayout expandingLayout = getExpandingView(position, convertView);
+        }
 
         convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT));
+
+        return convertView;
+    }
+
+    public ExpandingLayout getExpandingView(int position, View convertView) {
+        final SampleListItem object = mData.get(position);
+        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
+        TextView textView = (TextView) convertView.findViewById(R.id.text_view);
+
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
+                .getResources(), object.getSc().getIconResId(), null)));
+        textView.setText(getContext().getString(object.getSc().getTextResId()));
 
         ExpandingLayout expandingLayout = (ExpandingLayout) convertView.findViewById(R.id.expanding_layout);
         expandingLayout.setExpandedHeight(object.getExpandedHeight());
@@ -102,8 +107,7 @@ public class CustomArrayAdapter extends ArrayAdapter<SampleListItem> {
         } else {
             expandingLayout.setVisibility(View.VISIBLE);
         }
-
-        return convertView;
+        return expandingLayout;
     }
 
     /**
