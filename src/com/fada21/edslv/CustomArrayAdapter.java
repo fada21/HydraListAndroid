@@ -18,7 +18,6 @@ package com.fada21.edslv;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -28,13 +27,10 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.fada21.edslv.sample.SampleListItem;
@@ -46,61 +42,22 @@ import com.fada21.edslv.sample.SampleListItem;
 public class CustomArrayAdapter extends ExpandableListAdapter<SampleListItem> {
 
     public CustomArrayAdapter(Context context, int layoutViewResourceId, List<SampleListItem> data) {
-        super(context, layoutViewResourceId, data);
-    }
-
-    /**
-     * Populates the item in the listview cell with the appropriate data. This method
-     * sets the thumbnail image, the title and the extra text. This method also updates
-     * the layout parameters of the item's view so that the image and title are centered
-     * in the bounds of the collapsed view, and such that the extra text is not displayed
-     * in the collapsed state of the cell.
-     */
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        final SampleListItem object = mData.get(position);
-
-        if (convertView == null) {
-            LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-            convertView = inflater.inflate(mLayoutViewResourceId, parent, false);
-        }
-
-        LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(
-                R.id.item_linear_layout));
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams
-                (AbsListView.LayoutParams.MATCH_PARENT, object.getCollapsedHeight());
-        linearLayout.setLayoutParams(linearLayoutParams);
-
-        TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
-        ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
-
-        titleView.setText(object.getSc().getName());
-        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), object.getSc().getIconResId(), null)));
-
-        if (object.isExpandble()) {
-            ExpandingLayout expandingLayout = getExpandingView(position, convertView);
-        }
-
-        convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                AbsListView.LayoutParams.WRAP_CONTENT));
-
-        return convertView;
+        super(context, layoutViewResourceId, R.id.expanding_layout, data);
     }
 
     public ExpandingLayout getExpandingView(int position, View convertView) {
         final SampleListItem object = mData.get(position);
-        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
-        TextView textView = (TextView) convertView.findViewById(R.id.text_view);
-
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), object.getSc().getIconResId(), null)));
-        textView.setText(getContext().getString(object.getSc().getTextResId()));
 
         ExpandingLayout expandingLayout = (ExpandingLayout) convertView.findViewById(R.id.expanding_layout);
         expandingLayout.setExpandedHeight(object.getExpandedHeight());
         expandingLayout.setSizeChangedListener(object);
+
+        ImageView expImgView = (ImageView) expandingLayout.findViewById(R.id.exp_image_view);
+        TextView textView = (TextView) expandingLayout.findViewById(R.id.text_view);
+
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
+                .getResources(), object.getSc().getIconResId(), null)));
+        textView.setText(getContext().getString(object.getSc().getTextResId()));
 
         if (!object.isExpanded()) {
             expandingLayout.setVisibility(View.GONE);
@@ -134,6 +91,30 @@ public class CustomArrayAdapter extends ExpandableListAdapter<SampleListItem> {
         canvas.drawBitmap(bitmap, rect, rect, paint);
 
         return output;
+    }
+
+    @Override
+    protected void setupCollapsedView(View convertView, SampleListItem data) {
+        LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.item_linear_layout));
+        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
+        linearLayout.setLayoutParams(linearLayoutParams);
+
+        TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
+        ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
+
+        titleView.setText(data.getSc().getName());
+        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
+                .getResources(), data.getSc().getIconResId(), null)));
+
+    }
+
+    @Override
+    protected void setupExpandedView(View convertView, SampleListItem data) {
+        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
+        TextView textView = (TextView) convertView.findViewById(R.id.text_view);
+
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data.getSc().getIconResId(), null)));
+        textView.setText(getContext().getString(data.getSc().getTextResId()));
     }
 
 }

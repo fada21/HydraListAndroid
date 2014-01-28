@@ -197,7 +197,7 @@ public class ExpandingListView extends ListView {
      * @param position
      */
     private void expandView(final View view, int position, long id) {
-        ExpandingLayout expandingLayout = getExpandableAdapter().getExpandingView(position, view);
+        ExpandingLayout expandingLayout = getExpandableAdapter().getExpandedView(position, view);
 
         final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView
                 (view));
