@@ -35,9 +35,7 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
 
         setupCollapsedView(convertView, data);
 
-        if (data.isExpandble()) {
-            getExpandedView(position, convertView);
-        }
+        getExpandedView(position, convertView);
 
         convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT));
@@ -62,7 +60,8 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
         expandingLayout.setExpandedHeight(data.getExpandedHeight());
         expandingLayout.setSizeChangedListener(data);
 
-        setupExpandedView(convertView, data);
+        if (data.isExpandble())
+            setupExpandedView(convertView, data);
 
         if (!data.isExpanded()) {
             expandingLayout.setVisibility(View.GONE);

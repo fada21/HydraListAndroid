@@ -24,8 +24,6 @@ import android.os.Bundle;
 
 import com.fada21.edslv.ExpandingListView;
 import com.fada21.edslv.R;
-import com.fada21.edslv.R.id;
-import com.fada21.edslv.R.layout;
 
 /**
  * This activity creates a listview whose items can be clicked to expand and show
@@ -40,7 +38,6 @@ import com.fada21.edslv.R.layout;
  */
 public class ExpadingDragableStickyListViewActivity extends Activity {
 
-    private final int         CELL_DEFAULT_HEIGHT = 200;
     private final int         NUM_OF_CELLS        = 45;
 
     private ExpandingListView mListView;
