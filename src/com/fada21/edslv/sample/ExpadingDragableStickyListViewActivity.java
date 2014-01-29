@@ -22,7 +22,6 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.fada21.edslv.CustomArrayAdapter;
 import com.fada21.edslv.ExpandingListView;
 import com.fada21.edslv.R;
 import com.fada21.edslv.R.id;

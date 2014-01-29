@@ -65,14 +65,15 @@ public class ExpandingListView extends ListView {
 
     @Override
     public void setAdapter(ListAdapter adapter) {
-        throw new UnsupportedOperationException("Must use adapter of ArrayAdapter<? extends ExpandableListItem>");
+        throw new UnsupportedOperationException("Must use adapter of ExpandableListAdapter<? extends ExpandableListItem>");
     }
 
-    public ExpandableListAdapter<? extends ExpandableListItem> getExpandableAdapter() {
-        return (ExpandableListAdapter<? extends ExpandableListItem>) getAdapter();
+    @SuppressWarnings("unchecked")
+    public <T extends ExpandableListItem> ExpandingListAdapter<T> getExpandingAdapter() {
+        return (ExpandingListAdapter<T>) getAdapter();
     }
 
-    public void setAdapter(ExpandableListAdapter<? extends ExpandableListItem> adapter) {
+    public void setAdapter(ExpandingListAdapter<? extends ExpandableListItem> adapter) {
         super.setAdapter(adapter);
     }
 
@@ -89,10 +90,12 @@ public class ExpandingListView extends ListView {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView(view));
-                        if (viewObject.isExpandble() && !viewObject.isExpanded()) {
-                            expandView(view, position, id);
-                        } else {
-                            collapseView(view, position, id);
+                        if (viewObject.isExpandble()) {
+                            if (!viewObject.isExpanded()) {
+                                expandView(view, position, id);
+                            } else {
+                                collapseView(view, position, id);
+                            }
                         }
                     }
                 };
@@ -197,7 +200,7 @@ public class ExpandingListView extends ListView {
      * @param position
      */
     private void expandView(final View view, int position, long id) {
-        ExpandingLayout expandingLayout = getExpandableAdapter().getExpandedView(position, view);
+        ExpandingLayout expandingLayout = getExpandingAdapter().getExpandedView(position, view);
 
         final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView
                 (view));
@@ -406,7 +409,6 @@ public class ExpandingListView extends ListView {
      * @param id
      * @param position
      */
-
     private void collapseView(final View view, int position, long id) {
         final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition
                 (getPositionForView(view));

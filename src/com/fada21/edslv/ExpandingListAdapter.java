@@ -11,13 +11,13 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public abstract class ExpandableListAdapter<T extends ExpandableListItem> extends ArrayAdapter<T> {
+public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends ArrayAdapter<T> {
 
     protected List<T>   mData;
     protected final int mLayoutViewResourceId;
     protected final int mExpandingLayoutResId;
 
-    public ExpandableListAdapter(Context context, int layoutViewResourceId, int expandingLayoutResourceId, List<T> data) {
+    public ExpandingListAdapter(Context context, int layoutViewResourceId, int expandingLayoutResourceId, List<T> data) {
         super(context, layoutViewResourceId, data);
         mLayoutViewResourceId = layoutViewResourceId;
         mExpandingLayoutResId = expandingLayoutResourceId;
@@ -45,15 +45,20 @@ public abstract class ExpandableListAdapter<T extends ExpandableListItem> extend
         return convertView;
     }
 
+    /**
+     * Implement look of collapsed view of a list item
+     * 
+     * @param convertView
+     *            view to alter
+     * @param data
+     *            to be filled
+     */
     protected abstract void setupCollapsedView(View convertView, T data);
 
-    public ExpandingLayout getExpandedView(int position, View convertView) {
+    protected ExpandingLayout getExpandedView(int position, View convertView) {
         final T data = mData.get(position);
 
-        View expandingLayoutCandidate = convertView.findViewById(mExpandingLayoutResId);
-        ensureHasExpandableLayout(expandingLayoutCandidate);
-
-        ExpandingLayout expandingLayout = (ExpandingLayout) expandingLayoutCandidate;
+        ExpandingLayout expandingLayout = getExpandingLayoutSafely(convertView);
         expandingLayout.setExpandedHeight(data.getExpandedHeight());
         expandingLayout.setSizeChangedListener(data);
 
@@ -67,12 +72,23 @@ public abstract class ExpandableListAdapter<T extends ExpandableListItem> extend
         return expandingLayout;
     }
 
-    private void ensureHasExpandableLayout(View expLay) {
-        if (expLay == null || !(expLay instanceof ExpandingLayout)) {
-            throw new IllegalStateException("Expandable list adapter should provide ExpandingLayout");
+    public ExpandingLayout getExpandingLayoutSafely(View convertView) {
+        View expandingLayoutCandidate = convertView.findViewById(mExpandingLayoutResId);
+        if (expandingLayoutCandidate == null || !(expandingLayoutCandidate instanceof ExpandingLayout)) {
+            throw new IllegalStateException("ExpandingListAdapter should be provided with ExpandingLayout widget in its layout");
+        } else {
+            return (ExpandingLayout) expandingLayoutCandidate;
         }
     }
 
+    /**
+     * Implement look of expanded view of a list item
+     * 
+     * @param convertView
+     *            view to alter
+     * @param data
+     *            to be filled
+     */
     protected abstract void setupExpandedView(View convertView, T data);
 
 }

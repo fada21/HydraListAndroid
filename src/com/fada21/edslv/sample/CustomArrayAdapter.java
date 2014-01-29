@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fada21.edslv;
+package com.fada21.edslv.sample;
 
 import java.util.List;
 
@@ -33,38 +33,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.fada21.edslv.sample.SampleListItem;
+import com.fada21.edslv.ExpandingListAdapter;
+import com.fada21.edslv.R;
 
 /**
  * This is a custom array adapter used to populate the listview whose items will
  * expand to display extra content in addition to the default display.
  */
-public class CustomArrayAdapter extends ExpandableListAdapter<SampleListItem> {
+public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
 
     public CustomArrayAdapter(Context context, int layoutViewResourceId, List<SampleListItem> data) {
         super(context, layoutViewResourceId, R.id.expanding_layout, data);
-    }
-
-    public ExpandingLayout getExpandingView(int position, View convertView) {
-        final SampleListItem object = mData.get(position);
-
-        ExpandingLayout expandingLayout = (ExpandingLayout) convertView.findViewById(R.id.expanding_layout);
-        expandingLayout.setExpandedHeight(object.getExpandedHeight());
-        expandingLayout.setSizeChangedListener(object);
-
-        ImageView expImgView = (ImageView) expandingLayout.findViewById(R.id.exp_image_view);
-        TextView textView = (TextView) expandingLayout.findViewById(R.id.text_view);
-
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), object.getSc().getIconResId(), null)));
-        textView.setText(getContext().getString(object.getSc().getTextResId()));
-
-        if (!object.isExpanded()) {
-            expandingLayout.setVisibility(View.GONE);
-        } else {
-            expandingLayout.setVisibility(View.VISIBLE);
-        }
-        return expandingLayout;
     }
 
     /**
@@ -96,7 +75,8 @@ public class CustomArrayAdapter extends ExpandableListAdapter<SampleListItem> {
     @Override
     protected void setupCollapsedView(View convertView, SampleListItem data) {
         LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.item_linear_layout));
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
+        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
+                data.getCollapsedHeight());
         linearLayout.setLayoutParams(linearLayoutParams);
 
         TextView titleView = (TextView) convertView.findViewById(R.id.title_view);

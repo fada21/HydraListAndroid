@@ -7,7 +7,7 @@ import com.fada21.edslv.R;
 public enum SampleContents {
 
     CHAMELEON("Chameleon", R.drawable.chameleon, CELL_DEFAULT_HEIGHT, R.string.short_lorem_ipsum),
-    ROCK("Rock", R.drawable.rock, CELL_DEFAULT_HEIGHT, R.string.medium_lorem_ipsum),
+    ROCK("Rock", R.drawable.rock, CELL_DEFAULT_HEIGHT + 100, R.string.medium_lorem_ipsum),
     FLOWER("Flower", R.drawable.flower, CELL_DEFAULT_HEIGHT, R.string.long_lorem_ipsum);
 
     private final String name;
