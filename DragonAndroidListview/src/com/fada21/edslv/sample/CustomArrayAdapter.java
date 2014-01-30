@@ -32,6 +32,7 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fada21.edslv.ExpandingListAdapter;
 import com.fada21.edslv.R;
@@ -50,8 +51,7 @@ public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
      * Crops a circle out of the thumbnail photo.
      */
     public Bitmap getCroppedBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Config.ARGB_8888);
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
@@ -73,27 +73,44 @@ public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
     }
 
     @Override
-    protected void setupCollapsedView(View convertView, SampleListItem data) {
+    protected void setupCollapsedView(View convertView, final SampleListItem data) {
         LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.item_linear_layout));
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                data.getCollapsedHeight());
+        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
+                AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
         linearLayout.setLayoutParams(linearLayoutParams);
 
         TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
         ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
+        imgView.setOnClickListener(new View.OnClickListener() {
 
-        titleView.setText(data.getSc().getName());
-        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext()
-                .getResources(), data.getSc().getIconResId(), null)));
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+
+        titleView.setText(data.getSc().getName() + " " + data.getNumber());
+        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data.getSc()
+                .getIconResId(), null)));
 
     }
 
     @Override
-    protected void setupExpandedView(View convertView, SampleListItem data) {
+    protected void setupExpandedView(View convertView, final SampleListItem data) {
         ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
+        expImgView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
         TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data.getSc().getIconResId(), null)));
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data
+                .getSc().getIconResId(), null)));
         textView.setText(getContext().getString(data.getSc().getTextResId()));
     }
 

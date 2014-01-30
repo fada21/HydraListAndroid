@@ -38,7 +38,7 @@ import com.fada21.edslv.R;
  */
 public class ExpadingDragableStickyListViewActivity extends Activity {
 
-    private final int         NUM_OF_CELLS        = 45;
+    private final int         NUM_OF_CELLS = 45;
 
     private ExpandingListView mListView;
 
@@ -47,17 +47,13 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SampleListItem[] values = new SampleListItem[] {
-                new SampleListItem(SampleContents.CHAMELEON),
-                new SampleListItem(SampleContents.ROCK),
-                new SampleListItem(SampleContents.FLOWER)
-        };
+        SampleContents[] sampleContents = SampleContents.values();
 
         List<SampleListItem> mData = new ArrayList<SampleListItem>();
 
         for (int i = 0; i < NUM_OF_CELLS; i++) {
-            SampleListItem obj = values[i % values.length];
-            mData.add(new SampleListItem(obj.getSc()));
+            SampleContents sc = sampleContents[i % sampleContents.length];
+            mData.add(new SampleListItem(sc, i + 1));
         }
 
         CustomArrayAdapter adapter = new CustomArrayAdapter(this, R.layout.list_view_item, mData);

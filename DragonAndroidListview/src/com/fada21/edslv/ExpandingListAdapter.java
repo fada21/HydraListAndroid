@@ -24,18 +24,24 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
         mData = data;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final T data = mData.get(position);
 
+        ExpandableViewHolder viewHolder = null;
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
             convertView = inflater.inflate(mLayoutViewResourceId, parent, false);
+            viewHolder = new ExpandableViewHolder(convertView, mExpandingLayoutResId);
+            convertView.setTag(mExpandingLayoutResId, viewHolder);
+        } else {
+            viewHolder = (ExpandableViewHolder) convertView.getTag(mExpandingLayoutResId);
         }
 
         setupCollapsedView(convertView, data);
 
-        getExpandedView(position, convertView);
+        getExpandedView(convertView, position);
 
         convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT));
@@ -50,13 +56,15 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
      *            view to alter
      * @param data
      *            to be filled
+     * @param viewHelper
+     *            pattern for performance
      */
     protected abstract void setupCollapsedView(View convertView, T data);
 
-    protected ExpandingLayout getExpandedView(int position, View convertView) {
-        final T data = mData.get(position);
-
-        ExpandingLayout expandingLayout = getExpandingLayoutSafely(convertView);
+    protected ExpandingLayout getExpandedView(View convertView, int position) {
+        T data = mData.get(position);
+        ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(mExpandingLayoutResId);
+        ExpandingLayout expandingLayout = viewHolder.expandingLayout;
         expandingLayout.setExpandedHeight(data.getExpandedHeight());
         expandingLayout.setSizeChangedListener(data);
 
@@ -69,15 +77,6 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
             expandingLayout.setVisibility(View.VISIBLE);
         }
         return expandingLayout;
-    }
-
-    public ExpandingLayout getExpandingLayoutSafely(View convertView) {
-        View expandingLayoutCandidate = convertView.findViewById(mExpandingLayoutResId);
-        if (expandingLayoutCandidate == null || !(expandingLayoutCandidate instanceof ExpandingLayout)) {
-            throw new IllegalStateException("ExpandingListAdapter should be provided with ExpandingLayout widget in its layout");
-        } else {
-            return (ExpandingLayout) expandingLayoutCandidate;
-        }
     }
 
     /**

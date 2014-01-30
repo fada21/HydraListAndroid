@@ -5,10 +5,12 @@ import com.fada21.edslv.ExpandableListItem;
 public class SampleListItem extends ExpandableListItem {
 
     private SampleContents sc;
+    private int            number;
 
-    public SampleListItem(SampleContents sc) {
+    public SampleListItem(SampleContents sc, int number) {
         super(sc.getDefHeight(), sc != SampleContents.ROCK);
         this.sc = sc;
+        this.number = number;
     }
 
     public SampleContents getSc() {
@@ -17,6 +19,14 @@ public class SampleListItem extends ExpandableListItem {
 
     public void setSc(SampleContents sc) {
         this.sc = sc;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
 }
