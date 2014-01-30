@@ -76,6 +76,7 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
         } else {
             expandingLayout.setVisibility(View.VISIBLE);
         }
+
         return expandingLayout;
     }
 
