@@ -39,6 +39,13 @@ public abstract class ExpandableListItem implements OnSizeChangedListener {
         mExpandedHeight = -1;
     }
 
+    /**
+     * Provide unique id for this item
+     * 
+     * @return long id
+     */
+    public abstract long getId();
+
     public boolean isExpandble() {
         return mIsExpandable;
     }

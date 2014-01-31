@@ -11,7 +11,9 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends ArrayAdapter<T> {
+public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends ArrayAdapter<T> implements Dragable {
+
+    public final int    INVALID_ID = -1;
 
     protected List<T>   mData;
     protected final int mLayoutViewResourceId;
@@ -22,6 +24,20 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
         mLayoutViewResourceId = layoutViewResourceId;
         mExpandingLayoutResId = expandingLayoutResourceId;
         mData = data;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (position < 0 || position >= mData.size()) {
+            return INVALID_ID;
+        } else {
+            return getItem(position).getId();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -89,5 +105,14 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
      *            to be filled
      */
     protected abstract void setupExpandedView(View convertView, T data);
+
+    @Override
+    public void swap(int indexOne, int indexTwo) {
+        List<T> data = mData;
+        T temp = data.get(indexOne);
+        data.set(indexOne, data.get(indexTwo));
+        data.set(indexTwo, temp);
+        notifyDataSetChanged();
+    }
 
 }

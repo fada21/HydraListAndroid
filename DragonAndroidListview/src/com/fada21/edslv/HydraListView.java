@@ -3,31 +3,38 @@ package com.fada21.edslv;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.ListAdapter;
 
+import com.fada21.edslv.dragable.DragableListView;
 import com.fada21.edslv.expandable.ExpandingListAdapter;
 import com.fada21.edslv.expandable.ExpandingListView;
+import com.fada21.edslv.util.PublicListView;
 
 /**
  * <p>
- * Provides various custom list view behavior and effects with animations. It composes these in a way of being a proxy. Behavior is switched on end of by
- * methods:
+ * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by methods:
  * <li>
- * {@link #setExpandable()} - to switch expandable effects implemented in {@link ExpandingListView}, as adapter supply {@link ExpandingListAdapter}</li>
+ * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListView}, remember to supply instance of {@link ExpandingListAdapter}</li>
+ * <li>
+ * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListView}, as adapter supply {@link ExpandingListAdapter}</li>
  * </p>
  * 
  * <br/>
  * <p>
- * Note that {@link #setAdapter(ListAdapter)} must be called aftet behavior switching methods or these will throw {@link IllegalStateException}
+ * Note that {@link #setAdapter(ListAdapter)} must not be called before behavior switching methods or these will throw {@link IllegalStateException}
  * </p>
  */
-public class HydraListView extends NakedListView {
+public class HydraListView extends PublicListView {
 
     private boolean           adapterEstablished = false;
     private boolean           isExpandable       = false;
     private boolean           isDragable         = false;
 
     private ExpandingListView expandingListView  = null;
+    private DragableListView  dragableListView   = null;
+
+    // ====== standaard constuctors
 
     public HydraListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -41,6 +48,8 @@ public class HydraListView extends NakedListView {
         super(context);
     }
 
+    // ====== behaviour switchers
+
     public boolean isExpandable() {
         return isExpandable;
     }
@@ -48,6 +57,35 @@ public class HydraListView extends NakedListView {
     public boolean isDragable() {
         return isDragable;
     }
+
+    public void setExpandable(boolean isExpandable) {
+        unsureAdapterNotSet();
+
+        if (isExpandable) {
+            expandingListView = new ExpandingListView(this);
+        } else {
+            expandingListView = null;
+        }
+        this.isExpandable = isExpandable;
+    }
+
+    public void setDragable(boolean isDragable) {
+        unsureAdapterNotSet();
+
+        if (isDragable) {
+            dragableListView = new DragableListView(this);
+        } else {
+            dragableListView = null;
+        }
+        this.isDragable = isDragable;
+    }
+
+    private void unsureAdapterNotSet() {
+        if (adapterEstablished)
+            throw new IllegalStateException("Can not change behavior properties after adapter has been set");
+    }
+
+    // ====== must be overridden methods and mix custom list views behavior, be careful when extending these
 
     @Override
     public void setAdapter(ListAdapter adapter) {
@@ -60,30 +98,23 @@ public class HydraListView extends NakedListView {
         super.setAdapter(adapter);
     }
 
-    public void setExpandable(boolean isExpandable) {
-        if (adapterEstablished)
-            throw new IllegalStateException("Can not change expandable property after adapter has been set");
-
-        if (isExpandable) {
-            expandingListView = new ExpandingListView(this);
-        } else {
-            expandingListView = null;
-        }
-        this.isExpandable = isExpandable;
-    }
-
-    public void setDragable(boolean isDragable) {
-        if (adapterEstablished)
-            throw new IllegalStateException("Can not change dragable property after adapter has been set");
-
-        this.isDragable = isDragable;
-    }
-
     @Override
     public void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
         if (isExpandable) {
             expandingListView.dispatchDraw(canvas);
+        }
+        if (isDragable) {
+            dragableListView.dispatchDraw(canvas);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (isDragable && dragableListView.onTouchEvent(ev)) {
+            return true;
+        } else {
+            return super.onTouchEvent(ev);
         }
     }
 

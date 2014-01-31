@@ -29,4 +29,9 @@ public class SampleListItem extends ExpandableListItem {
         this.number = number;
     }
 
+    @Override
+    public long getId() {
+        return number;
+    }
+
 }

@@ -60,6 +60,7 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
 
         mListView = (HydraListView) findViewById(R.id.main_list_view);
         mListView.setExpandable(true);
+        mListView.setDragable(true);
         mListView.setAdapter(adapter);
         mListView.setDivider(null);
     }

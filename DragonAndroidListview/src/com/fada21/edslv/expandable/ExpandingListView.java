@@ -32,8 +32,8 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
-import com.fada21.edslv.NakedListView;
 import com.fada21.edslv.R;
+import com.fada21.edslv.util.PublicListView;
 
 /**
  * A custom listview which supports the preview of extra content corresponding to each cell
@@ -47,9 +47,9 @@ public class ExpandingListView {
 
     private int[]         mTranslate;
 
-    private final NakedListView nlv;
+    private final PublicListView nlv;
 
-    public ExpandingListView(NakedListView nlv) {
+    public ExpandingListView(PublicListView nlv) {
         this.nlv = nlv;
         init();
     }

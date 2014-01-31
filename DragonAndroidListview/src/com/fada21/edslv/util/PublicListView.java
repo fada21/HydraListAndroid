@@ -1,4 +1,4 @@
-package com.fada21.edslv;
+package com.fada21.edslv.util;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,23 +9,24 @@ import android.view.View;
 import android.widget.ListView;
 
 /**
- * Exposes all non public methods
+ * Exposes all essential non public methods of {@link ListView}
  */
-public class NakedListView extends ListView {
+public abstract class PublicListView extends ListView {
 
-    public NakedListView(Context context, AttributeSet attrs, int defStyle) {
+    public PublicListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-    public NakedListView(Context context, AttributeSet attrs) {
+    public PublicListView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public NakedListView(Context context) {
+    public PublicListView(Context context) {
         super(context);
     }
 
-    // =============== naked ListView methods
+    // =============== non public ListView methods made public
+
     @Override
     public void layoutChildren() {
         super.layoutChildren();
@@ -56,7 +57,7 @@ public class NakedListView extends ListView {
         super.onFinishInflate();
     }
 
-    // =============== naked AbsListView methods
+    // =============== non public AbsListView methods made public
 
     @Override
     public int computeVerticalScrollExtent() {
