@@ -34,8 +34,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fada21.edslv.ExpandingListAdapter;
 import com.fada21.edslv.R;
+import com.fada21.edslv.expandable.ExpandingListAdapter;
 
 /**
  * This is a custom array adapter used to populate the listview whose items will

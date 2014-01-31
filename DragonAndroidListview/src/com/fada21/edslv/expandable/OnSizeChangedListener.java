@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fada21.edslv;
+package com.fada21.edslv.expandable;
 
 /**
  * A listener used to update the list data object when the corresponding expanding

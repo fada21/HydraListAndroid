@@ -1,4 +1,4 @@
-package com.fada21.edslv;
+package com.fada21.edslv.expandable;
 
 import android.view.View;
 

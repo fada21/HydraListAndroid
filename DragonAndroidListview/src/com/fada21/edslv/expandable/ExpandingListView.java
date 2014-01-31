@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fada21.edslv;
+package com.fada21.edslv.expandable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,56 +25,38 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.support.v4.view.ViewCompat;
-import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+
+import com.fada21.edslv.NakedListView;
+import com.fada21.edslv.R;
 
 /**
  * A custom listview which supports the preview of extra content corresponding to each cell
  * by clicking on the cell to hide and show the extra content.
  */
-public class ExpandingListView extends ListView {
+public class ExpandingListView {
 
-    private boolean    mShouldRemoveObserver = false;
+    private boolean       mShouldRemoveObserver = false;
 
-    private List<View> mViewsToDraw          = new ArrayList<View>();
+    private List<View>    mViewsToDraw          = new ArrayList<View>();
 
-    private int[]      mTranslate;
+    private int[]         mTranslate;
 
-    public ExpandingListView(Context context) {
-        super(context);
+    private final NakedListView nlv;
+
+    public ExpandingListView(NakedListView nlv) {
+        this.nlv = nlv;
         init();
-    }
-
-    public ExpandingListView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public ExpandingListView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    @Override
-    public void setAdapter(ListAdapter adapter) {
-        throw new UnsupportedOperationException("Must use adapter of ExpandableListAdapter<? extends ExpandableListItem>");
     }
 
     @SuppressWarnings("unchecked")
     public <T extends ExpandableListItem> ExpandingListAdapter<T> getExpandingAdapter() {
-        return (ExpandingListAdapter<T>) getAdapter();
-    }
-
-    public void setAdapter(ExpandingListAdapter<? extends ExpandableListItem> adapter) {
-        super.setAdapter(adapter);
+        return (ExpandingListAdapter<T>) nlv.getAdapter();
     }
 
     /**
@@ -83,13 +65,13 @@ public class ExpandingListView extends ListView {
      */
     private AdapterView.OnItemClickListener mItemClickListener;
 
-    private void init() {
+    protected void init() {
         mItemClickListener =
                 new AdapterView
                 .OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView(view));
+                        ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
                         if (viewObject.isExpandble()) {
                             if (!viewObject.isExpanded()) {
                                 expandView(view, position, id);
@@ -99,7 +81,7 @@ public class ExpandingListView extends ListView {
                         }
                     }
                 };
-        setOnItemClickListener(mItemClickListener);
+        nlv.setOnItemClickListener(mItemClickListener);
     }
 
     /**
@@ -128,19 +110,19 @@ public class ExpandingListView extends ListView {
 
         if (isExpanding) {
             boolean isOverTop = top < 0;
-            boolean isBelowBottom = (top + height + yDelta) > getHeight();
+            boolean isBelowBottom = (top + height + yDelta) > nlv.getHeight();
             if (isOverTop) {
                 yTranslateTop = top;
                 yTranslateBottom = yDelta - yTranslateTop;
             } else if (isBelowBottom) {
-                int deltaBelow = top + height + yDelta - getHeight();
+                int deltaBelow = top + height + yDelta - nlv.getHeight();
                 yTranslateTop = top - deltaBelow < 0 ? top : deltaBelow;
                 yTranslateBottom = yDelta - yTranslateTop;
             }
         } else {
-            int offset = computeVerticalScrollOffset();
-            int range = computeVerticalScrollRange();
-            int extent = computeVerticalScrollExtent();
+            int offset = nlv.computeVerticalScrollOffset();
+            int range = nlv.computeVerticalScrollRange();
+            int extent = nlv.computeVerticalScrollExtent();
             int leftoverExtent = range - offset - extent;
 
             boolean isCollapsingBelowBottom = (yTranslateBottom > leftoverExtent);
@@ -202,7 +184,7 @@ public class ExpandingListView extends ListView {
     private void expandView(final View view, int position, long id) {
         ExpandingLayout expandingLayout = getExpandingAdapter().getExpandedView(view, position);
 
-        final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition(getPositionForView
+        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView
                 (view));
 
         /* Store the original top and bottom bounds of all the cells. */
@@ -211,9 +193,9 @@ public class ExpandingListView extends ListView {
 
         final HashMap<View, int[]> oldCoordinates = new HashMap<View, int[]>();
 
-        int childCount = getChildCount();
+        int childCount = nlv.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            View v = getChildAt(i);
+            View v = nlv.getChildAt(i);
             ViewCompat.setHasTransientState(v, true);
             oldCoordinates.put(v, new int[] { v.getTop(), v.getBottom() });
         }
@@ -227,7 +209,7 @@ public class ExpandingListView extends ListView {
          * means that the final post layout properties for all the items have already been
          * determined, but still have not been rendered onto the screen.
          */
-        final ViewTreeObserver observer = getViewTreeObserver();
+        final ViewTreeObserver observer = nlv.getViewTreeObserver();
         observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 
             @Override
@@ -254,14 +236,14 @@ public class ExpandingListView extends ListView {
                     int currentTop = view.getTop();
                     int futureTop = oldTop - mTranslate[0];
 
-                    int firstChildStartTop = getChildAt(0).getTop();
-                    int firstVisiblePosition = getFirstVisiblePosition();
+                    int firstChildStartTop = nlv.getChildAt(0).getTop();
+                    int firstVisiblePosition = nlv.getFirstVisiblePosition();
                     int deltaTop = currentTop - futureTop;
 
                     int i;
-                    int childCount = getChildCount();
+                    int childCount = nlv.getChildCount();
                     for (i = 0; i < childCount; i++) {
-                        View v = getChildAt(i);
+                        View v = nlv.getChildAt(i);
                         int height = v.getBottom() - Math.max(0, v.getTop());
                         if (deltaTop - height > 0) {
                             firstVisiblePosition++;
@@ -275,10 +257,10 @@ public class ExpandingListView extends ListView {
                         firstChildStartTop = 0;
                     }
 
-                    setSelectionFromTop(firstVisiblePosition, firstChildStartTop - deltaTop);
+                    nlv.setSelectionFromTop(firstVisiblePosition, firstChildStartTop - deltaTop);
 
                     /* Request another layout to update the layout parameters of the cells. */
-                    requestLayout();
+                    nlv.requestLayout();
 
                     /*
                      * Return false such that the ListView does not redraw its contents on
@@ -297,7 +279,7 @@ public class ExpandingListView extends ListView {
 
                 ArrayList<Animator> animations = new ArrayList<Animator>();
 
-                int index = indexOfChild(view);
+                int index = nlv.indexOfChild(view);
 
                 /*
                  * Loop through all the views that were on the screen before the cell was
@@ -316,7 +298,7 @@ public class ExpandingListView extends ListView {
                         int delta = old[0] < oldTop ? -yTranslateTop : yTranslateBottom;
                         animations.add(getAnimation(v, delta, delta));
                     } else {
-                        int i = indexOfChild(v);
+                        int i = nlv.indexOfChild(v);
                         if (v != view) {
                             int delta = i > index ? yTranslateBottom : -yTranslateTop;
                             animations.add(getAnimation(v, delta, delta));
@@ -333,8 +315,8 @@ public class ExpandingListView extends ListView {
                         View.ALPHA, 0, 1));
 
                 /* Disabled the ListView for the duration of the animation. */
-                setEnabled(false);
-                setClickable(false);
+                nlv.setEnabled(false);
+                nlv.setClickable(false);
 
                 /* Play all the animations created above together at the same time. */
                 AnimatorSet s = new AnimatorSet();
@@ -343,8 +325,8 @@ public class ExpandingListView extends ListView {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         viewObject.setExpanded(true);
-                        setEnabled(true);
-                        setClickable(true);
+                        nlv.setEnabled(true);
+                        nlv.setClickable(true);
                         if (mViewsToDraw.size() > 0) {
                             for (View v : mViewsToDraw) {
                                 ViewCompat.setHasTransientState(v, false);
@@ -368,10 +350,7 @@ public class ExpandingListView extends ListView {
      * directly onto the canvas during the animation process. After the animation
      * completes, the references to the extra views can then be discarded.
      */
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-
+    public void dispatchDraw(Canvas canvas) {
         if (mViewsToDraw.size() == 0) {
             return;
         }
@@ -410,8 +389,8 @@ public class ExpandingListView extends ListView {
      * @param position
      */
     private void collapseView(final View view, int position, long id) {
-        final ExpandableListItem viewObject = (ExpandableListItem) getItemAtPosition
-                (getPositionForView(view));
+        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition
+                (nlv.getPositionForView(view));
 
         /* Store the original top and bottom bounds of all the cells. */
         final int oldTop = view.getTop();
@@ -419,9 +398,9 @@ public class ExpandingListView extends ListView {
 
         final HashMap<View, int[]> oldCoordinates = new HashMap<View, int[]>();
 
-        int childCount = getChildCount();
+        int childCount = nlv.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            View v = getChildAt(i);
+            View v = nlv.getChildAt(i);
             ViewCompat.setHasTransientState(v, true);
             oldCoordinates.put(v, new int[] { v.getTop(), v.getBottom() });
         }
@@ -431,7 +410,7 @@ public class ExpandingListView extends ListView {
                 viewObject.getCollapsedHeight()));
 
         /* Add an onPreDraw listener. */
-        final ViewTreeObserver observer = getViewTreeObserver();
+        final ViewTreeObserver observer = nlv.getViewTreeObserver();
         observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 
             @Override
@@ -457,14 +436,14 @@ public class ExpandingListView extends ListView {
                     int currentTop = view.getTop();
                     int futureTop = oldTop + mTranslate[0];
 
-                    int firstChildStartTop = getChildAt(0).getTop();
-                    int firstVisiblePosition = getFirstVisiblePosition();
+                    int firstChildStartTop = nlv.getChildAt(0).getTop();
+                    int firstVisiblePosition = nlv.getFirstVisiblePosition();
                     int deltaTop = currentTop - futureTop;
 
                     int i;
-                    int childCount = getChildCount();
+                    int childCount = nlv.getChildCount();
                     for (i = 0; i < childCount; i++) {
-                        View v = getChildAt(i);
+                        View v = nlv.getChildAt(i);
                         int height = v.getBottom() - Math.max(0, v.getTop());
                         if (deltaTop - height > 0) {
                             firstVisiblePosition++;
@@ -478,9 +457,9 @@ public class ExpandingListView extends ListView {
                         firstChildStartTop = 0;
                     }
 
-                    setSelectionFromTop(firstVisiblePosition, firstChildStartTop - deltaTop);
+                    nlv.setSelectionFromTop(firstVisiblePosition, firstChildStartTop - deltaTop);
 
-                    requestLayout();
+                    nlv.requestLayout();
 
                     return false;
                 }
@@ -491,10 +470,10 @@ public class ExpandingListView extends ListView {
                 int yTranslateTop = mTranslate[0];
                 int yTranslateBottom = mTranslate[1];
 
-                int index = indexOfChild(view);
-                int childCount = getChildCount();
+                int index = nlv.indexOfChild(view);
+                int childCount = nlv.getChildCount();
                 for (int i = 0; i < childCount; i++) {
-                    View v = getChildAt(i);
+                    View v = nlv.getChildAt(i);
                     int[] old = oldCoordinates.get(v);
                     if (old != null) {
                         /*
@@ -521,7 +500,7 @@ public class ExpandingListView extends ListView {
                 /* Animates all the cells present on the screen after the collapse. */
                 ArrayList<Animator> animations = new ArrayList<Animator>();
                 for (int i = 0; i < childCount; i++) {
-                    View v = getChildAt(i);
+                    View v = nlv.getChildAt(i);
                     if (v != view) {
                         float diff = i > index ? -yTranslateBottom : yTranslateTop;
                         animations.add(getAnimation(v, diff, diff));
@@ -535,8 +514,8 @@ public class ExpandingListView extends ListView {
                 animations.add(ObjectAnimator.ofFloat(expandingLayout, View.ALPHA, 1, 0));
 
                 /* Disabled the ListView for the duration of the animation. */
-                setEnabled(false);
-                setClickable(false);
+                nlv.setEnabled(false);
+                nlv.setClickable(false);
 
                 /* Play all the animations created above together at the same time. */
                 AnimatorSet s = new AnimatorSet();
@@ -548,8 +527,8 @@ public class ExpandingListView extends ListView {
                         view.setLayoutParams(new AbsListView.LayoutParams(AbsListView
                                 .LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
                         viewObject.setExpanded(false);
-                        setEnabled(true);
-                        setClickable(true);
+                        nlv.setEnabled(true);
+                        nlv.setClickable(true);
                         /*
                          * Note that alpha must be set back to 1 in case this view is reused
                          * by a cell that was expanded, but not yet collapsed, so its state

@@ -22,7 +22,7 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.fada21.edslv.ExpandingListView;
+import com.fada21.edslv.HydraListView;
 import com.fada21.edslv.R;
 
 /**
@@ -38,9 +38,9 @@ import com.fada21.edslv.R;
  */
 public class ExpadingDragableStickyListViewActivity extends Activity {
 
-    private final int         NUM_OF_CELLS = 45;
+    private final int     NUM_OF_CELLS = 45;
 
-    private ExpandingListView mListView;
+    private HydraListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,8 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
 
         CustomArrayAdapter adapter = new CustomArrayAdapter(this, R.layout.list_view_item, mData);
 
-        mListView = (ExpandingListView) findViewById(R.id.main_list_view);
+        mListView = (HydraListView) findViewById(R.id.main_list_view);
+        mListView.setExpandable(true);
         mListView.setAdapter(adapter);
         mListView.setDivider(null);
     }

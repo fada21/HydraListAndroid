@@ -1,6 +1,6 @@
 package com.fada21.edslv.sample;
 
-import com.fada21.edslv.ExpandableListItem;
+import com.fada21.edslv.expandable.ExpandableListItem;
 
 public class SampleListItem extends ExpandableListItem {
 

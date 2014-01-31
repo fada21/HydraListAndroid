@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fada21.edslv;
+package com.fada21.edslv.expandable;
 
 import android.content.Context;
 import android.util.AttributeSet;
