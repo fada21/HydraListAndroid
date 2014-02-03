@@ -16,16 +16,18 @@
 
 package com.fada21.edslv.expandable;
 
+import com.fada21.edslv.data.HydraListItem;
+
 /**
  * <p>
  * This custom object is used to populate the list adapter. It contains a reference to an image, title, and the extra text to be displayed. Furthermore, it
  * keeps track of the current state (collapsed/expanded) of the corresponding item in the list, as well as store the height of the cell in its collapsed state.
  * </p>
  * <p>
- * It should also state if item is expandable with method {@link #isExpandble()}.
+ * It should also state if item is expandable with method {@link #isExpandable()}.
  * </p>
  */
-public abstract class ExpandableListItem implements OnSizeChangedListener {
+public abstract class ExpandableListItem implements OnSizeChangedListener, HydraListItem {
 
     private boolean mIsExpandable;
     private boolean mIsExpanded;
@@ -39,14 +41,7 @@ public abstract class ExpandableListItem implements OnSizeChangedListener {
         mExpandedHeight = -1;
     }
 
-    /**
-     * Provide unique id for this item
-     * 
-     * @return long id
-     */
-    public abstract long getId();
-
-    public boolean isExpandble() {
+    public boolean isExpandable() {
         return mIsExpandable;
     }
 

@@ -6,18 +6,20 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ListAdapter;
 
-import com.fada21.edslv.dragable.DragableListView;
+import com.fada21.edslv.data.HydraListItem;
+import com.fada21.edslv.dragable.DragableListViewImpl;
 import com.fada21.edslv.expandable.ExpandingListAdapter;
-import com.fada21.edslv.expandable.ExpandingListView;
+import com.fada21.edslv.expandable.ExpandingListViewImpl;
 import com.fada21.edslv.util.PublicListView;
 
 /**
  * <p>
  * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by methods:
  * <li>
- * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListView}, remember to supply instance of {@link ExpandingListAdapter}</li>
+ * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewImpl}, remember to supply instance of
+ * {@link ExpandingListAdapter}</li>
  * <li>
- * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListView}, as adapter supply {@link ExpandingListAdapter}</li>
+ * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListViewImpl}, as adapter supply {@link ExpandingListAdapter}</li>
  * </p>
  * 
  * <br/>
@@ -27,14 +29,13 @@ import com.fada21.edslv.util.PublicListView;
  */
 public class HydraListView extends PublicListView {
 
-    private boolean           adapterEstablished = false;
-    private boolean           isExpandable       = false;
-    private boolean           isDragable         = false;
+    private boolean               isExpandable      = false;
+    private boolean               isDragable        = false;
 
-    private ExpandingListView expandingListView  = null;
-    private DragableListView  dragableListView   = null;
+    private ExpandingListViewImpl expandingListView = null;
+    private DragableListViewImpl  dragableListView  = null;
 
-    // ====== standaard constuctors
+    // ====== standard constructors
 
     public HydraListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -48,7 +49,7 @@ public class HydraListView extends PublicListView {
         super(context);
     }
 
-    // ====== behaviour switchers
+    // ====== Behavior switchers
 
     public boolean isExpandable() {
         return isExpandable;
@@ -59,10 +60,8 @@ public class HydraListView extends PublicListView {
     }
 
     public void setExpandable(boolean isExpandable) {
-        unsureAdapterNotSet();
-
         if (isExpandable) {
-            expandingListView = new ExpandingListView(this);
+            expandingListView = new ExpandingListViewImpl(this);
         } else {
             expandingListView = null;
         }
@@ -70,31 +69,34 @@ public class HydraListView extends PublicListView {
     }
 
     public void setDragable(boolean isDragable) {
-        unsureAdapterNotSet();
-
         if (isDragable) {
-            dragableListView = new DragableListView(this);
+            dragableListView = new DragableListViewImpl(this);
         } else {
             dragableListView = null;
         }
         this.isDragable = isDragable;
     }
 
-    private void unsureAdapterNotSet() {
-        if (adapterEstablished)
-            throw new IllegalStateException("Can not change behavior properties after adapter has been set");
-    }
-
     // ====== must be overridden methods and mix custom list views behavior, be careful when extending these
 
     @Override
     public void setAdapter(ListAdapter adapter) {
-        adapterEstablished = true;
-        if (isExpandable) {
-            if (!(adapter instanceof ExpandingListAdapter)) {
-                throw new UnsupportedOperationException("Must use adapter of ExpandableListAdapter<? extends ExpandableListItem>");
-            }
+        if (!(adapter instanceof HydraListAdapter)) {
+            throw new UnsupportedOperationException("Must use adapter of type HydraListAdapter");
+        } else {
+            setHydraListAdapter((HydraListAdapter<?>) adapter);
         }
+
+    }
+
+    /**
+     * Ensures {@link HydraListView} has proper behavior upon supplied adapter. Once adapter is supplied it cannot be changed.
+     * 
+     * @param adapter
+     */
+    public void setHydraListAdapter(HydraListAdapter<? extends HydraListItem> adapter) {
+        setExpandable(adapter.isExpandable());
+        setDragable(adapter.isDragable());
         super.setAdapter(adapter);
     }
 

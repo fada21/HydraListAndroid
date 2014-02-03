@@ -32,31 +32,33 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
+import com.fada21.edslv.HydraListAdapter;
 import com.fada21.edslv.R;
+import com.fada21.edslv.data.HydraListItem;
 import com.fada21.edslv.util.PublicListView;
 
 /**
  * A custom listview which supports the preview of extra content corresponding to each cell
  * by clicking on the cell to hide and show the extra content.
  */
-public class ExpandingListView {
+public class ExpandingListViewImpl<T extends HydraListItem> {
 
-    private boolean       mShouldRemoveObserver = false;
+    private boolean              mShouldRemoveObserver = false;
 
-    private List<View>    mViewsToDraw          = new ArrayList<View>();
+    private List<View>           mViewsToDraw          = new ArrayList<View>();
 
-    private int[]         mTranslate;
+    private int[]                mTranslate;
 
     private final PublicListView nlv;
 
-    public ExpandingListView(PublicListView nlv) {
+    public ExpandingListViewImpl(PublicListView nlv) {
         this.nlv = nlv;
         init();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ExpandableListItem> ExpandingListAdapter<T> getExpandingAdapter() {
-        return (ExpandingListAdapter<T>) nlv.getAdapter();
+    public HydraListAdapter<T> getExpandingAdapter() {
+        return (HydraListAdapter<T>) nlv.getAdapter();
     }
 
     /**
@@ -72,7 +74,7 @@ public class ExpandingListView {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
-                        if (viewObject.isExpandble()) {
+                        if (viewObject.isExpandable()) {
                             if (!viewObject.isExpanded()) {
                                 expandView(view, position, id);
                             } else {
@@ -182,10 +184,11 @@ public class ExpandingListView {
      * @param position
      */
     private void expandView(final View view, int position, long id) {
-        ExpandingLayout expandingLayout = getExpandingAdapter().getExpandedView(view, position);
+        HydraListAdapter<T> expandingAdapter = getExpandingAdapter();
+        T item = expandingAdapter.getDataProvider().get(position);
+        ExpandingLayout expandingLayout = expandingAdapter.getExpandingHelper().getExpandedView(view, item);
 
-        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView
-                (view));
+        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
 
         /* Store the original top and bottom bounds of all the cells. */
         final int oldTop = view.getTop();
@@ -389,8 +392,7 @@ public class ExpandingListView {
      * @param position
      */
     private void collapseView(final View view, int position, long id) {
-        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition
-                (nlv.getPositionForView(view));
+        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
 
         /* Store the original top and bottom bounds of all the cells. */
         final int oldTop = view.getTop();

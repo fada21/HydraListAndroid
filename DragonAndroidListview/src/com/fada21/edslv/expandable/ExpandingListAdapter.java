@@ -11,6 +11,8 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.fada21.edslv.dragable.Dragable;
+
 public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends ArrayAdapter<T> implements Dragable {
 
     public final int    INVALID_ID = -1;
@@ -18,6 +20,8 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
     protected List<T>   mData;
     protected final int mLayoutViewResourceId;
     protected final int mExpandingLayoutResId;
+
+    //
 
     public ExpandingListAdapter(Context context, int layoutViewResourceId, int expandingLayoutResourceId, List<T> data) {
         super(context, layoutViewResourceId, data);
@@ -84,7 +88,7 @@ public abstract class ExpandingListAdapter<T extends ExpandableListItem> extends
         expandingLayout.setExpandedHeight(data.getExpandedHeight());
         expandingLayout.setSizeChangedListener(data);
 
-        if (data.isExpandble())
+        if (data.isExpandable())
             setupExpandedView(convertView, data);
 
         if (!data.isExpanded()) {

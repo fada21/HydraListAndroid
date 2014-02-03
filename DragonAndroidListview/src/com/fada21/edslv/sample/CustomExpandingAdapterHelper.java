@@ -16,8 +16,6 @@
 
 package com.fada21.edslv.sample;
 
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -35,16 +33,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fada21.edslv.R;
-import com.fada21.edslv.expandable.ExpandingListAdapter;
+import com.fada21.edslv.helper.ExpandingAdapterHelper;
 
 /**
  * This is a custom array adapter used to populate the listview whose items will
  * expand to display extra content in addition to the default display.
  */
-public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
+public class CustomExpandingAdapterHelper extends ExpandingAdapterHelper<SampleListItem> {
 
-    public CustomArrayAdapter(Context context, int layoutViewResourceId, List<SampleListItem> data) {
-        super(context, layoutViewResourceId, R.id.expanding_layout, data);
+    public CustomExpandingAdapterHelper(Context context, int expandingLayoutRes) {
+        super(context, expandingLayoutRes);
     }
 
     /**
@@ -73,7 +71,7 @@ public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
     }
 
     @Override
-    protected void setupCollapsedView(View convertView, final SampleListItem data) {
+    public void setupCollapsedView(View convertView, final SampleListItem data) {
         LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.item_linear_layout));
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                 AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
@@ -85,13 +83,13 @@ public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
+                Toast.makeText(ctx, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
                         .show();
             }
         });
 
         titleView.setText(data.getSc().getName() + " " + data.getNumber());
-        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data.getSc()
+        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(ctx.getResources(), data.getSc()
                 .getIconResId(), null)));
 
     }
@@ -103,15 +101,15 @@ public class CustomArrayAdapter extends ExpandingListAdapter<SampleListItem> {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
+                Toast.makeText(ctx, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
                         .show();
             }
         });
         TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(getContext().getResources(), data
+        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(ctx.getResources(), data
                 .getSc().getIconResId(), null)));
-        textView.setText(getContext().getString(data.getSc().getTextResId()));
+        textView.setText(ctx.getString(data.getSc().getTextResId()));
     }
 
 }

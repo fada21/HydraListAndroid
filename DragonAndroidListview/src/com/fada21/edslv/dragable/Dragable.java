@@ -1,4 +1,4 @@
-package com.fada21.edslv.expandable;
+package com.fada21.edslv.dragable;
 
 import android.widget.BaseAdapter;
 

@@ -22,8 +22,11 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.fada21.edslv.HydraListAdapter;
+import com.fada21.edslv.HydraListAdapter.Builder;
 import com.fada21.edslv.HydraListView;
 import com.fada21.edslv.R;
+import com.fada21.edslv.helper.DragableAdapterHelper;
 
 /**
  * This activity creates a listview whose items can be clicked to expand and show
@@ -56,12 +59,15 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
             mData.add(new SampleListItem(sc, i + 1));
         }
 
-        CustomArrayAdapter adapter = new CustomArrayAdapter(this, R.layout.list_view_item, mData);
+        Builder<SampleListItem> builder = HydraListAdapter.with(this, R.layout.list_view_item, SampleListItem.class);
+        builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout)).dragable(new DragableAdapterHelper<SampleListItem>()).data(
+                new SampleDataProvider(mData));
+        HydraListAdapter<SampleListItem> hydraListAdapter = builder.build();
 
         mListView = (HydraListView) findViewById(R.id.main_list_view);
         mListView.setExpandable(true);
         mListView.setDragable(true);
-        mListView.setAdapter(adapter);
+        mListView.setAdapter(hydraListAdapter);
         mListView.setDivider(null);
     }
 }
