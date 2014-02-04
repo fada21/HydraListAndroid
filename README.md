@@ -1,10 +1,15 @@
 HydraListAndroid
 =====================
 
-Drag and drop expandable Listview for Android with animations
+Listview for Android that can incorporate behavior of:
 
+ - drag and drop 
+ - expandable
+ - ... work in progress
+
+=====================
 TODO
- - license issues with Olshansky
- - Sticky header 
- - better sample
- - writing library expansion example
+ - license issues - contact with Daniel Olshansky
+ - sticky headers 
+ - better samples
+ - writing library expansion tutorial
