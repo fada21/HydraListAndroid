@@ -33,7 +33,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import com.fada21.hydralist.HydraListAdapter;
-import com.fada21.hydralist.R;
 import com.fada21.hydralist.util.PublicListView;
 
 /**
@@ -312,7 +311,7 @@ public class ExpandingListViewImpl {
                 animations.add(getAnimation(view, -yTranslateTop, yTranslateBottom));
 
                 /* Adds an animation for fading in the extra content. */
-                animations.add(ObjectAnimator.ofFloat(view.findViewById(R.id.expanding_layout), View.ALPHA, 0, 1));
+                animations.add(ObjectAnimator.ofFloat(view.findViewById(getExpandingAdapter().getExpandingHelper().getExpandingLayout()), View.ALPHA, 0, 1));
 
                 /* Disabled the ListView for the duration of the animation. */
                 nlv.setEnabled(false);

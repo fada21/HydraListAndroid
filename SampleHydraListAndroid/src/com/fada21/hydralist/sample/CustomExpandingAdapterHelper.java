@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fada21.hydralist.R;
 import com.fada21.hydralist.expandable.ExpandingAdapterHelper;
 
 /**

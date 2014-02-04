@@ -25,7 +25,6 @@ import android.os.Bundle;
 import com.fada21.hydralist.HydraListAdapter;
 import com.fada21.hydralist.HydraListAdapter.Builder;
 import com.fada21.hydralist.HydraListView;
-import com.fada21.hydralist.R;
 import com.fada21.hydralist.dragable.DragableAdapterHelper;
 
 /**
