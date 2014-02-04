@@ -19,6 +19,11 @@ public abstract class BaseAdapterHelper<T extends HydraListItem> extends HydraAd
         this.itemLayout = itemLayout;
     }
 
+    /**
+     * Provides list item layout resource id. Layout shall be inflated from this resource.
+     * 
+     * @return
+     */
     public int getItemLayout() {
         return itemLayout;
     }
@@ -42,7 +47,6 @@ public abstract class BaseAdapterHelper<T extends HydraListItem> extends HydraAd
     public abstract void setupCollapsedView(View convertView, T data);
 
     public View newView(ViewGroup parent) {
-        LayoutInflater.from(context);
         return inflater.inflate(itemLayout, parent, false);
     }
 

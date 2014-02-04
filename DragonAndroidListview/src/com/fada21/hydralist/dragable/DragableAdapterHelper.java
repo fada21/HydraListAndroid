@@ -1,9 +1,10 @@
-package com.fada21.hydralist.helper;
+package com.fada21.hydralist.dragable;
 
 import static com.fada21.hydralist.util.HydraListConsts.UNSET;
 import android.content.Context;
 
 import com.fada21.hydralist.data.HydraListItem;
+import com.fada21.hydralist.helper.HydraAdapterHelper;
 
 public class DragableAdapterHelper<T extends HydraListItem> extends HydraAdapterHelper<T> {
 

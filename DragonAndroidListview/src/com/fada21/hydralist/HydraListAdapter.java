@@ -1,9 +1,6 @@
 package com.fada21.hydralist;
 
-import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -13,23 +10,28 @@ import android.widget.ListView;
 import com.fada21.hydralist.data.HydraListDataProvider;
 import com.fada21.hydralist.data.HydraListItem;
 import com.fada21.hydralist.dragable.Dragable;
-import com.fada21.hydralist.expandable.ExpandableViewHolder;
+import com.fada21.hydralist.dragable.DragableAdapterHelper;
+import com.fada21.hydralist.expandable.ExpandingAdapterHelper;
 import com.fada21.hydralist.helper.BaseAdapterHelper;
-import com.fada21.hydralist.helper.DragableAdapterHelper;
-import com.fada21.hydralist.helper.ExpandingAdapterHelper;
 import com.fada21.hydralist.helper.HydraAdapterHelper;
 import com.fada21.hydralist.util.HydraListConsts;
 
 /**
- * Adapter for {@link HydraListView}. Extend this to customize list item appearance.
+ * 
+ * <p>
+ * Adapter for {@link HydraListView}. It works as container for various behaviors implemented in helpers which extends {@link HydraAdapterHelper}.
+ * </p>
+ * <p>
+ * Adapter class cannot be extended. In order to extends adapter and implement extra views, animations or behavior one must extends one of the helpers which is
+ * pass on to the builder.
+ * </p>
+ * <p>
+ * In order to add extra list behavior in a modularized way please add a helper and change relevant parts in {@link HydraListView} class.
+ * </p>
  * 
  * @param <T>
- *            extension to HydraListItem. Determines data operations and initialization compliance
  */
 public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter {
-
-    protected final boolean                   isExpandable;
-    protected final boolean                   isDragable;
 
     protected final HydraListDataProvider<T>  dataProvider;
 
@@ -41,8 +43,6 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 
     @SuppressWarnings("unchecked")
     private HydraListAdapter(Builder<T> b) {
-        isExpandable = b.isExpandable;
-        isDragable = b.isDragable;
         dataProvider = b.dataProvider;
 
         itemLayout = b.baseAdapterHelper.getItemLayout();
@@ -66,13 +66,11 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
      *            only for parameterization
      * @return HydraBuilder for constructing HydraList Adapter
      */
-    public static <BT extends HydraListItem> Builder<BT> with(BaseAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
+    public static <BT extends HydraListItem> Builder<BT> builder(BaseAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
         return new Builder<BT>(baseAdapterHelper);
     }
 
     public static class Builder<BT extends HydraListItem> {
-        private boolean                    isExpandable           = false;
-        private boolean                    isDragable             = false;
 
         private HydraListDataProvider<BT>  dataProvider;
 
@@ -94,13 +92,11 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
         }
 
         public Builder<BT> expandable(ExpandingAdapterHelper<BT> helper) {
-            isExpandable = true;
             expandingAdapterHelper = helper;
             return this;
         }
 
         public Builder<BT> dragable(DragableAdapterHelper<BT> helper) {
-            isDragable = true;
             dragableAdapterHelper = helper;
             return this;
         }
@@ -114,11 +110,11 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
     // ====== Behavior switchers
 
     public boolean isExpandable() {
-        return isExpandable;
+        return expandingHelper != null;
     }
 
     public boolean isDragable() {
-        return isDragable;
+        return dragableHelper != null;
     }
 
     public BaseAdapterHelper<T> getBaseAdapterHelper() {
@@ -147,9 +143,13 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
             }
         }
 
-        if (isDragable) {
+        if (baseAdapterHelper == null) {
+            throw new IllegalStateException("BaseAdapterHelper instance must be provided!");
+        }
+
+        if (isDragable()) {
             if (!(dataProvider instanceof Dragable)) {
-                throw new IllegalStateException("Data provider must implement Dragable interface");
+                throw new IllegalStateException("Data provider must implement Dragable interface!");
             }
         }
     }
@@ -186,14 +186,10 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
     public View getView(int position, View convertView, ViewGroup parent) {
         final T data = dataProvider.get(position);
 
-        if (isExpandable) {
+        if (isExpandable()) {
             if (convertView == null) {
                 convertView = baseAdapterHelper.newView(parent);
-
-                ExpandableViewHolder viewHolder = new ExpandableViewHolder(convertView,
-                        expandingHelper.getExpandingLayout());
-                convertView.setTag(expandingHelper.getExpandingLayout(), viewHolder);
-
+                expandingHelper.storeExpandableViewHolderAsTag(convertView);
             }
             baseAdapterHelper.setupCollapsedView(convertView, data);
             expandingHelper.getExpandedView(convertView, data);
@@ -204,8 +200,9 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
             baseAdapterHelper.setupCollapsedView(convertView, data);
         }
 
-        convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                AbsListView.LayoutParams.WRAP_CONTENT));
+        int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
+        int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
+        convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
 
         return convertView;
     }

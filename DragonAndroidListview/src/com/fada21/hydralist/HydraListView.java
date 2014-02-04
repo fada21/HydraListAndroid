@@ -13,18 +13,16 @@ import com.fada21.hydralist.util.PublicListView;
 
 /**
  * <p>
- * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by supplied
- * adapter triggering methods:
+ * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by supplied adapter triggering methods:
  * <li>
  * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewImpl}</li>
  * <li>
- * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListViewImpl}</li>
+ * {@link #setDragable()} - to switch expandable effects implemented in {@link DragableListViewImpl}</li>
  * </p>
  * 
  * <br/>
  * <p>
- * Note that {@link #setAdapter(ListAdapter)} must not be called before behavior switching methods or these will throw
- * {@link IllegalStateException}
+ * Note that {@link #setAdapter(ListAdapter)} must not be called before behavior switching methods or these will throw {@link IllegalStateException}
  * </p>
  */
 public class HydraListView extends PublicListView {

@@ -22,11 +22,11 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.fada21.hydralist.R;
 import com.fada21.hydralist.HydraListAdapter;
-import com.fada21.hydralist.HydraListView;
 import com.fada21.hydralist.HydraListAdapter.Builder;
-import com.fada21.hydralist.helper.DragableAdapterHelper;
+import com.fada21.hydralist.HydraListView;
+import com.fada21.hydralist.R;
+import com.fada21.hydralist.dragable.DragableAdapterHelper;
 
 /**
  * This activity creates a listview whose items can be clicked to expand and show
@@ -41,7 +41,7 @@ import com.fada21.hydralist.helper.DragableAdapterHelper;
  */
 public class HydraListActivity extends Activity {
 
-    private final int     NUM_OF_CELLS = 4;
+    private final int     NUM_OF_CELLS = 15;
 
     private HydraListView mListView;
 
@@ -59,8 +59,7 @@ public class HydraListActivity extends Activity {
             mData.add(new SampleListItem(sc, i + 1));
         }
 
-        Builder<SampleListItem> builder = HydraListAdapter.with(new SampleBaseAdapterHelper(this,
-                R.layout.list_view_item), SampleListItem.class);
+        Builder<SampleListItem> builder = HydraListAdapter.builder(new SampleBaseAdapterHelper(this, R.layout.list_view_item), SampleListItem.class);
         builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
         builder.dragable(new DragableAdapterHelper<SampleListItem>(this));
         builder.data(new SampleDataProvider(mData));

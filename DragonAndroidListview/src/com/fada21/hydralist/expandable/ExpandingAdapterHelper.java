@@ -1,12 +1,10 @@
-package com.fada21.hydralist.helper;
+package com.fada21.hydralist.expandable;
 
 import android.content.Context;
 import android.view.View;
 
 import com.fada21.hydralist.data.HydraListItem;
-import com.fada21.hydralist.expandable.ExpandableListItem;
-import com.fada21.hydralist.expandable.ExpandableViewHolder;
-import com.fada21.hydralist.expandable.ExpandingLayout;
+import com.fada21.hydralist.helper.HydraAdapterHelper;
 import com.fada21.hydralist.util.HydraListConsts;
 
 public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends HydraAdapterHelper<T> {
@@ -18,6 +16,11 @@ public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends Hy
         this.expandingLayout = expandingLayout;
     }
 
+    /**
+     * Provides id in layout in which expanding layout should be filled
+     * 
+     * @return view element id for expanding part
+     */
     public int getExpandingLayout() {
         return expandingLayout;
     }
@@ -27,6 +30,11 @@ public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends Hy
         if (expandingLayout == HydraListConsts.UNSET) {
             throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
         }
+    }
+
+    public void storeExpandableViewHolderAsTag(View convertView) {
+        ExpandableViewHolder viewHolder = new ExpandableViewHolder(convertView, getExpandingLayout());
+        convertView.setTag(getExpandingLayout(), viewHolder);
     }
 
     public ExpandingLayout getExpandedView(View convertView, T data) {

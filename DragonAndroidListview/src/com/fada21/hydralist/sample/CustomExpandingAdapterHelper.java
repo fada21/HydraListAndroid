@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fada21.hydralist.R;
-import com.fada21.hydralist.helper.ExpandingAdapterHelper;
+import com.fada21.hydralist.expandable.ExpandingAdapterHelper;
 
 /**
  * This is a custom array adapter used to populate the listview whose items will
