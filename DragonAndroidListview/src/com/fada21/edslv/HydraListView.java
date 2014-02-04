@@ -8,23 +8,23 @@ import android.widget.ListAdapter;
 
 import com.fada21.edslv.data.HydraListItem;
 import com.fada21.edslv.dragable.DragableListViewImpl;
-import com.fada21.edslv.expandable.ExpandingListAdapter;
 import com.fada21.edslv.expandable.ExpandingListViewImpl;
 import com.fada21.edslv.util.PublicListView;
 
 /**
  * <p>
- * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by methods:
+ * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by supplied
+ * adapter triggering methods:
  * <li>
- * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewImpl}, remember to supply instance of
- * {@link ExpandingListAdapter}</li>
+ * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewImpl}</li>
  * <li>
- * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListViewImpl}, as adapter supply {@link ExpandingListAdapter}</li>
+ * {@link #setDragable()} - to switch expandable effects implemented in {@link ExpandingListViewImpl}</li>
  * </p>
  * 
  * <br/>
  * <p>
- * Note that {@link #setAdapter(ListAdapter)} must not be called before behavior switching methods or these will throw {@link IllegalStateException}
+ * Note that {@link #setAdapter(ListAdapter)} must not be called before behavior switching methods or these will throw
+ * {@link IllegalStateException}
  * </p>
  */
 public class HydraListView extends PublicListView {
@@ -90,7 +90,8 @@ public class HydraListView extends PublicListView {
     }
 
     /**
-     * Ensures {@link HydraListView} has proper behavior upon supplied adapter. Once adapter is supplied it cannot be changed.
+     * Ensures {@link HydraListView} has proper behavior upon supplied adapter. Once adapter is supplied it cannot be
+     * changed.
      * 
      * @param adapter
      */

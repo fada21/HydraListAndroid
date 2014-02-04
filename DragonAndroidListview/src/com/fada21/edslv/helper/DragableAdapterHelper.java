@@ -1,6 +1,7 @@
 package com.fada21.edslv.helper;
 
 import static com.fada21.edslv.util.HydraListConsts.UNSET;
+import android.content.Context;
 
 import com.fada21.edslv.data.HydraListItem;
 
@@ -9,20 +10,20 @@ public class DragableAdapterHelper<T extends HydraListItem> extends HydraAdapter
     private final int allowedRangeStartPosition;
     private final int allowedRangeEndPosition;
 
-    public DragableAdapterHelper() {
-        super();
+    public DragableAdapterHelper(Context context) {
+        super(context);
         this.allowedRangeStartPosition = UNSET;
         this.allowedRangeEndPosition = UNSET;
     }
 
-    public DragableAdapterHelper(int allowedRangeStartPosition) {
-        super();
+    public DragableAdapterHelper(Context context, int allowedRangeStartPosition) {
+        super(context);
         this.allowedRangeStartPosition = allowedRangeStartPosition;
         this.allowedRangeEndPosition = UNSET;
     }
 
-    public DragableAdapterHelper(int allowedRangeStartPosition, int allowedRangeEndPosition) {
-        super();
+    public DragableAdapterHelper(Context context, int allowedRangeStartPosition, int allowedRangeEndPosition) {
+        super(context);
         this.allowedRangeStartPosition = allowedRangeStartPosition;
         this.allowedRangeEndPosition = allowedRangeEndPosition;
     }

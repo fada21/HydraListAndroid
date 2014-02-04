@@ -38,7 +38,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.fada21.edslv.HydraListAdapter;
+import com.fada21.edslv.HydraListView;
+import com.fada21.edslv.util.HydraListConsts;
 import com.fada21.edslv.util.PublicListView;
+
+import static com.fada21.edslv.util.HydraListConsts.INVALID;
 
 /**
  * The dynamic listview is an extension of listview that supports cell dragging
@@ -78,19 +82,15 @@ public class DragableListViewImpl {
     private boolean              mIsMobileScrolling           = false;
     private int                  mSmoothScrollAmountAtEdge    = 0;
 
-    // TODO delete this
-    private final int            INVALID_ID                   = -1;
-
-    private long                 mAboveItemId                 = INVALID_ID;
-    private long                 mMobileItemId                = INVALID_ID;
-    private long                 mBelowItemId                 = INVALID_ID;
+    private long                 mAboveItemId                 = INVALID;
+    private long                 mMobileItemId                = INVALID;
+    private long                 mBelowItemId                 = INVALID;
 
     private BitmapDrawable       mHoverCell;
     private Rect                 mHoverCellCurrentBounds;
     private Rect                 mHoverCellOriginalBounds;
 
-    private final int            INVALID_POINTER_ID           = -1;
-    private int                  mActivePointerId             = INVALID_POINTER_ID;
+    private int                  mActivePointerId             = INVALID;
 
     private boolean              mIsWaitingForScrollFinish    = false;
     private int                  mScrollState                 = ListView.OnScrollListener.SCROLL_STATE_IDLE;
@@ -250,7 +250,7 @@ public class DragableListViewImpl {
                 mActivePointerId = event.getPointerId(0);
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mActivePointerId == INVALID_POINTER_ID) {
+                if (mActivePointerId == INVALID) {
                     break;
                 }
 
@@ -383,7 +383,7 @@ public class DragableListViewImpl {
             mCellIsMobile = false;
             mIsWaitingForScrollFinish = false;
             mIsMobileScrolling = false;
-            mActivePointerId = INVALID_POINTER_ID;
+            mActivePointerId = INVALID;
 
             // If the autoscroller has not completed scrolling, we need to wait for it to
             // finish in order to determine the final location of where the hover cell
@@ -411,9 +411,9 @@ public class DragableListViewImpl {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mAboveItemId = INVALID_ID;
-                    mMobileItemId = INVALID_ID;
-                    mBelowItemId = INVALID_ID;
+                    mAboveItemId = INVALID;
+                    mMobileItemId = INVALID;
+                    mBelowItemId = INVALID;
                     mobileView.setVisibility(View.VISIBLE);
                     mHoverCell = null;
                     nlv.setEnabled(true);
@@ -432,16 +432,16 @@ public class DragableListViewImpl {
     private void touchEventsCancelled() {
         View mobileView = getViewForID(mMobileItemId);
         if (mCellIsMobile) {
-            mAboveItemId = INVALID_ID;
-            mMobileItemId = INVALID_ID;
-            mBelowItemId = INVALID_ID;
+            mAboveItemId = INVALID;
+            mMobileItemId = INVALID;
+            mBelowItemId = INVALID;
             mobileView.setVisibility(View.VISIBLE);
             mHoverCell = null;
             nlv.invalidate();
         }
         mCellIsMobile = false;
         mIsMobileScrolling = false;
-        mActivePointerId = INVALID_POINTER_ID;
+        mActivePointerId = INVALID;
     }
 
     /**
@@ -562,7 +562,7 @@ public class DragableListViewImpl {
              */
             public void checkAndHandleFirstVisibleCellChange() {
                 if (mCurrentFirstVisibleItem != mPreviousFirstVisibleItem) {
-                    if (mCellIsMobile && mMobileItemId != INVALID_ID) {
+                    if (mCellIsMobile && mMobileItemId != INVALID) {
                         updateNeighborViewsForID(mMobileItemId);
                         handleCellSwitch();
                     }
@@ -577,7 +577,7 @@ public class DragableListViewImpl {
                 int currentLastVisibleItem = mCurrentFirstVisibleItem + mCurrentVisibleItemCount;
                 int previousLastVisibleItem = mPreviousFirstVisibleItem + mPreviousVisibleItemCount;
                 if (currentLastVisibleItem != previousLastVisibleItem) {
-                    if (mCellIsMobile && mMobileItemId != INVALID_ID) {
+                    if (mCellIsMobile && mMobileItemId != INVALID) {
                         updateNeighborViewsForID(mMobileItemId);
                         handleCellSwitch();
                     }

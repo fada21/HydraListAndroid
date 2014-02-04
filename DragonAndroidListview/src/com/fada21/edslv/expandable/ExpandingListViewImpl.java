@@ -41,7 +41,7 @@ import com.fada21.edslv.util.PublicListView;
  * A custom listview which supports the preview of extra content corresponding to each cell
  * by clicking on the cell to hide and show the extra content.
  */
-public class ExpandingListViewImpl<T extends HydraListItem> {
+public class ExpandingListViewImpl {
 
     private boolean              mShouldRemoveObserver = false;
 
@@ -57,8 +57,8 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
     }
 
     @SuppressWarnings("unchecked")
-    public HydraListAdapter<T> getExpandingAdapter() {
-        return (HydraListAdapter<T>) nlv.getAdapter();
+    public HydraListAdapter<ExpandableListItem> getExpandingAdapter() {
+        return (HydraListAdapter<ExpandableListItem>) nlv.getAdapter();
     }
 
     /**
@@ -68,29 +68,30 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
     private AdapterView.OnItemClickListener mItemClickListener;
 
     protected void init() {
-        mItemClickListener =
-                new AdapterView
-                .OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
-                        if (viewObject.isExpandable()) {
-                            if (!viewObject.isExpanded()) {
-                                expandView(view, position, id);
-                            } else {
-                                collapseView(view, position, id);
-                            }
-                        }
+        mItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                @SuppressWarnings("unchecked") ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv
+                        .getPositionForView(view));
+                if (item.isExpandable()) {
+                    if (!item.isExpanded()) {
+                        expandView(view, position, id);
+                    } else {
+                        collapseView(view, position, id);
                     }
-                };
+                }
+            }
+        };
         nlv.setOnItemClickListener(mItemClickListener);
     }
 
     /**
-     * Calculates the top and bottom bound changes of the selected item. These values are
+     * <p>Calculates the top and bottom bound changes of the selected item. These values are
      * also used to move the bounds of the items around the one that is actually being
      * expanded or collapsed.
+     * </p>
      * 
+     * <p>
      * This method can be modified to achieve different user experiences depending
      * on how you want the cells to expand or collapse. In this specific demo, the cells
      * always try to expand downwards (leaving top bound untouched), and similarly,
@@ -99,12 +100,12 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
      * moved to the top of the screen so as not to hide any additional content that
      * the user has not interacted with yet. Furthermore, if the collapsed cell is
      * partially off screen when it is first clicked, it is translated such that its
-     * full contents are visible. Lastly, this behaviour varies slightly near the bottom
+     * full contents are visible. Lastly, this behavior varies slightly near the bottom
      * of the listview in order to account for the fact that the bottom bounds of the actual
      * listview cannot be modified.
+     * </p>
      */
-    private int[] getTopAndBottomTranslations(int top, int bottom, int yDelta,
-            boolean isExpanding) {
+    private int[] getTopAndBottomTranslations(int top, int bottom, int yDelta, boolean isExpanding) {
         int yTranslateTop = 0;
         int yTranslateBottom = yDelta;
 
@@ -143,52 +144,53 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
     }
 
     /**
+     * <p>
      * This method expands the view that was clicked and animates all the views
      * around it to make room for the expanding view. There are several steps required
      * to do this which are outlined below.
+     * </p>
      * 
-     * 1. Store the current top and bottom bounds of each visible item in the listview.
-     * 2. Update the layout parameters of the selected view. In the context of this
+     * <li> Store the current top and bottom bounds of each visible item in the listview.</li>
+     * <li> Update the layout parameters of the selected view. In the context of this
      * method, the view should be originally collapsed and set to some custom height.
      * The layout parameters are updated so as to wrap the content of the additional
-     * text that is to be displayed.
+     * text that is to be displayed.</li>
      * 
+     * <br/><br/><p>
      * After invoking a layout to take place, the listview will order all the items
      * such that there is space for each view. This layout will be independent of what
      * the bounds of the items were prior to the layout so two pre-draw passes will
      * be made. This is necessary because after the layout takes place, some views that
      * were visible before the layout may now be off bounds but a reference to these
      * views is required so the animation completes as intended.
+     * </p><br/>
      * 
-     * 3. The first predraw pass will set the bounds of all the visible items to
+     * <li> The first predraw pass will set the bounds of all the visible items to
      * their original location before the layout took place and then force another
      * layout. Since the bounds of the cells cannot be set directly, the method
-     * setSelectionFromTop can be used to achieve a very similar effect.
-     * 4. The expanding view's bounds are animated to what the final values should be
-     * from the original bounds.
-     * 5. The bounds above the expanding view are animated upwards while the bounds
-     * below the expanding view are animated downwards.
-     * 6. The extra text is faded in as its contents become visible throughout the
-     * animation process.
+     * setSelectionFromTop can be used to achieve a very similar effect.</li>
+     * <li> The expanding view's bounds are animated to what the final values should be
+     * from the original bounds.</li>
+     * <li> The bounds above the expanding view are animated upwards while the bounds
+     * below the expanding view are animated downwards.</li>
+     * <li> The extra text is faded in as its contents become visible throughout the
+     * animation process.</li>
      * 
+     * <br/><br/><p>
      * It is important to note that the listview is disabled during the animation
-     * because the scrolling behaviour is unpredictable if the bounds of the items
+     * because the scrolling behavior is unpredictable if the bounds of the items
      * within the listview are not constant during the scroll.
+     * </p><br/>
      * 
-     * 
-     * TODO describe position and id
-     * 
-     * @param view2
-     * 
-     * @param id
-     * @param position
+     * @param view expanding view
+     * @param position item position in list
+     * @param id item id
      */
     private void expandView(final View view, int position, long id) {
-        HydraListAdapter<T> expandingAdapter = getExpandingAdapter();
-        T item = expandingAdapter.getDataProvider().get(position);
+        // final ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
+        HydraListAdapter<ExpandableListItem> expandingAdapter = getExpandingAdapter();
+        final ExpandableListItem item = expandingAdapter.getDataProvider().get(position);
         ExpandingLayout expandingLayout = expandingAdapter.getExpandingHelper().getExpandedView(view, item);
-
-        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
 
         /* Store the original top and bottom bounds of all the cells. */
         final int oldTop = view.getTop();
@@ -314,8 +316,7 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
                 animations.add(getAnimation(view, -yTranslateTop, yTranslateBottom));
 
                 /* Adds an animation for fading in the extra content. */
-                animations.add(ObjectAnimator.ofFloat(view.findViewById(R.id.expanding_layout),
-                        View.ALPHA, 0, 1));
+                animations.add(ObjectAnimator.ofFloat(view.findViewById(R.id.expanding_layout), View.ALPHA, 0, 1));
 
                 /* Disabled the ListView for the duration of the animation. */
                 nlv.setEnabled(false);
@@ -327,7 +328,7 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
                 s.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        viewObject.setExpanded(true);
+                        item.setExpanded(true);
                         nlv.setEnabled(true);
                         nlv.setClickable(true);
                         if (mViewsToDraw.size() > 0) {
@@ -370,29 +371,28 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
      * around it to close around the collapsing view. There are several steps required
      * to do this which are outlined below.
      * 
-     * 1. Update the layout parameters of the view clicked so as to minimize its height
-     * to the original collapsed (default) state.
-     * 2. After invoking a layout, the listview will shift all the cells so as to display
-     * them most efficiently. Therefore, during the first predraw pass, the listview
-     * must be offset by some amount such that given the custom bound change upon
-     * collapse, all the cells that need to be on the screen after the layout
-     * are rendered by the listview.
-     * 3. On the second predraw pass, all the items are first returned to their original
-     * location (before the first layout).
-     * 4. The collapsing view's bounds are animated to what the final values should be.
-     * 5. The bounds above the collapsing view are animated downwards while the bounds
-     * below the collapsing view are animated upwards.
-     * 6. The extra text is faded out as its contents become visible throughout the
-     * animation process.
+     * <li>Update the layout parameters of the view clicked so as to minimize its height to the original collapsed
+     * (default) state.</li> 
+     * <li>After invoking a layout, the listview will shift all the cells so as to display them
+     * most efficiently. Therefore, during the first predraw pass, the listview must be offset by some amount such that
+     * given the custom bound change upon collapse, all the cells that need to be on the screen after the layout are
+     * rendered by the listview.</li> 
+     * <li>On the second predraw pass, all the items are first returned to their original
+     * location (before the first layout).</li> 
+     * <li>The collapsing view's bounds are animated to what the final values
+     * should be.</li> 
+     * <li>The bounds above the collapsing view are animated downwards while the bounds below the
+     * collapsing view are animated upwards.</li> 
+     * <li>The extra text is faded out as its contents become visible
+     * throughout the animation process.</li>
      * 
-     * 
-     * TODO add description
-     * 
-     * @param id
-     * @param position
+     * @param view collapsing view
+     * @param position item position in list
+     * @param id item id
      */
     private void collapseView(final View view, int position, long id) {
-        final ExpandableListItem viewObject = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
+        // final ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
+        final ExpandableListItem item = getExpandingAdapter().getDataProvider().get(position);
 
         /* Store the original top and bottom bounds of all the cells. */
         final int oldTop = view.getTop();
@@ -408,8 +408,8 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
         }
 
         /* Update the layout so the extra content becomes invisible. */
-        view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                viewObject.getCollapsedHeight()));
+        view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, item
+                .getCollapsedHeight()));
 
         /* Add an onPreDraw listener. */
         final ViewTreeObserver observer = nlv.getViewTreeObserver();
@@ -526,9 +526,9 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         expandingLayout.setVisibility(View.GONE);
-                        view.setLayoutParams(new AbsListView.LayoutParams(AbsListView
-                                .LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
-                        viewObject.setExpanded(false);
+                        view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
+                                AbsListView.LayoutParams.WRAP_CONTENT));
+                        item.setExpanded(false);
                         nlv.setEnabled(true);
                         nlv.setClickable(true);
                         /*
@@ -560,8 +560,7 @@ public class ExpandingListViewImpl<T extends HydraListItem> {
         int endBottom = (int) (bottom + translateBottom);
 
         PropertyValuesHolder translationTop = PropertyValuesHolder.ofInt("top", top, endTop);
-        PropertyValuesHolder translationBottom = PropertyValuesHolder.ofInt("bottom", bottom,
-                endBottom);
+        PropertyValuesHolder translationBottom = PropertyValuesHolder.ofInt("bottom", bottom, endBottom);
 
         return ObjectAnimator.ofPropertyValuesHolder(view, translationTop, translationBottom);
     }

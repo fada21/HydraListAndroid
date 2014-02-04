@@ -14,6 +14,7 @@ import com.fada21.edslv.data.HydraListDataProvider;
 import com.fada21.edslv.data.HydraListItem;
 import com.fada21.edslv.dragable.Dragable;
 import com.fada21.edslv.expandable.ExpandableViewHolder;
+import com.fada21.edslv.helper.BaseAdapterHelper;
 import com.fada21.edslv.helper.DragableAdapterHelper;
 import com.fada21.edslv.helper.ExpandingAdapterHelper;
 import com.fada21.edslv.helper.HydraAdapterHelper;
@@ -27,60 +28,60 @@ import com.fada21.edslv.util.HydraListConsts;
  */
 public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter {
 
-    protected final Context                   ctx;
-
     protected final boolean                   isExpandable;
     protected final boolean                   isDragable;
 
     protected final HydraListDataProvider<T>  dataProvider;
 
-    protected final int                       layoutViewResource;
+    protected final int                       itemLayout;
 
+    private final BaseAdapterHelper<T>        baseAdapterHelper;
     protected final ExpandingAdapterHelper<T> expandingHelper;
     protected final DragableAdapterHelper<T>  dragableHelper;
 
     @SuppressWarnings("unchecked")
     private HydraListAdapter(Builder<T> b) {
-        ctx = b.ctx;
         isExpandable = b.isExpandable;
         isDragable = b.isDragable;
         dataProvider = b.dataProvider;
 
-        layoutViewResource = b.layoutViewResource;
+        itemLayout = b.baseAdapterHelper.getItemLayout();
 
+        baseAdapterHelper = b.baseAdapterHelper;
         expandingHelper = b.expandingAdapterHelper;
         dragableHelper = b.dragableAdapterHelper;
 
-        ensureCompliance(expandingHelper, dragableHelper);
+        ensureCompliance(baseAdapterHelper, expandingHelper, dragableHelper);
     }
 
     /**
-     * Initiates builder
+     * Initiates builder for adapter
      * 
      * @param <BT>
+     *            generic parameter for {@link Builder}
      * 
-     * @param context
+     * @param itemLayout
+     *            - layout to inflate for the view
+     * @param clazz
+     *            only for parameterization
      * @return HydraBuilder for constructing HydraList Adapter
      */
-    public static <BT extends HydraListItem> Builder<BT> with(Context context, int layoutViewResource, Class<BT> clazz) {
-        return new Builder<BT>(context, layoutViewResource);
+    public static <BT extends HydraListItem> Builder<BT> with(BaseAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
+        return new Builder<BT>(baseAdapterHelper);
     }
 
     public static class Builder<BT extends HydraListItem> {
-        private Context                    ctx;
         private boolean                    isExpandable           = false;
         private boolean                    isDragable             = false;
 
         private HydraListDataProvider<BT>  dataProvider;
 
-        private int                        layoutViewResource;
-
+        private BaseAdapterHelper<BT>      baseAdapterHelper      = null;
         private ExpandingAdapterHelper<BT> expandingAdapterHelper = null;
         private DragableAdapterHelper<BT>  dragableAdapterHelper  = null;
 
-        public Builder(Context context, int layoutViewResource) {
-            ctx = context;
-            this.layoutViewResource = layoutViewResource;
+        public Builder(BaseAdapterHelper<BT> helper) {
+            this.baseAdapterHelper = helper;
         }
 
         public Builder<BT> data(HydraListDataProvider<BT> dataProvider) {
@@ -120,6 +121,10 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
         return isDragable;
     }
 
+    public BaseAdapterHelper<T> getBaseAdapterHelper() {
+        return baseAdapterHelper;
+    }
+
     public ExpandingAdapterHelper<T> getExpandingHelper() {
         return expandingHelper;
     }
@@ -147,10 +152,6 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
                 throw new IllegalStateException("Data provider must implement Dragable interface");
             }
         }
-    }
-
-    protected Context getContext() {
-        return ctx;
     }
 
     public HydraListDataProvider<T> getDataProvider() {
@@ -181,32 +182,26 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final T data = dataProvider.get(position);
 
-        ExpandableViewHolder viewHolder = null;
-        if (convertView == null) {
-            LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-            convertView = inflater.inflate(layoutViewResource, parent, false);
-
-            if (isExpandable) {
-                viewHolder = new ExpandableViewHolder(convertView, expandingHelper.getExpandingLayoutResId());
-                convertView.setTag(expandingHelper.getExpandingLayoutResId(), viewHolder);
-            }
-
-        } else {
-
-            if (isExpandable) {
-                viewHolder = (ExpandableViewHolder) convertView.getTag(expandingHelper.getExpandingLayoutResId());
-            }
-
-        }
-
         if (isExpandable) {
-            expandingHelper.setupCollapsedView(convertView, data);
+            if (convertView == null) {
+                convertView = baseAdapterHelper.newView(parent);
+
+                ExpandableViewHolder viewHolder = new ExpandableViewHolder(convertView,
+                        expandingHelper.getExpandingLayout());
+                convertView.setTag(expandingHelper.getExpandingLayout(), viewHolder);
+
+            }
+            baseAdapterHelper.setupCollapsedView(convertView, data);
             expandingHelper.getExpandedView(convertView, data);
+        } else {
+            if (convertView == null) {
+                convertView = baseAdapterHelper.newView(parent);
+            }
+            baseAdapterHelper.setupCollapsedView(convertView, data);
         }
 
         convertView.setLayoutParams(new ListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,

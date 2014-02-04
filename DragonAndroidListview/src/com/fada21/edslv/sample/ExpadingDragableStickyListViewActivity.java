@@ -41,7 +41,7 @@ import com.fada21.edslv.helper.DragableAdapterHelper;
  */
 public class ExpadingDragableStickyListViewActivity extends Activity {
 
-    private final int     NUM_OF_CELLS = 45;
+    private final int     NUM_OF_CELLS = 4;
 
     private HydraListView mListView;
 
@@ -59,14 +59,14 @@ public class ExpadingDragableStickyListViewActivity extends Activity {
             mData.add(new SampleListItem(sc, i + 1));
         }
 
-        Builder<SampleListItem> builder = HydraListAdapter.with(this, R.layout.list_view_item, SampleListItem.class);
-        builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout)).dragable(new DragableAdapterHelper<SampleListItem>()).data(
-                new SampleDataProvider(mData));
+        Builder<SampleListItem> builder = HydraListAdapter.with(new SampleBaseAdapterHelper(this,
+                R.layout.list_view_item), SampleListItem.class);
+        builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
+        builder.dragable(new DragableAdapterHelper<SampleListItem>(this));
+        builder.data(new SampleDataProvider(mData));
         HydraListAdapter<SampleListItem> hydraListAdapter = builder.build();
 
         mListView = (HydraListView) findViewById(R.id.main_list_view);
-        mListView.setExpandable(true);
-        mListView.setDragable(true);
         mListView.setAdapter(hydraListAdapter);
         mListView.setDivider(null);
     }

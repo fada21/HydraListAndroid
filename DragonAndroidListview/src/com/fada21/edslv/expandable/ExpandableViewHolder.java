@@ -4,17 +4,17 @@ import android.view.View;
 
 public class ExpandableViewHolder {
 
-    private int            mExpandingLayoutResId;
+    private final int            expandingLayout;
 
-    public ExpandingLayout expandingLayout;
+    public ExpandingLayout expandingLayoutViewGroup;
 
     public ExpandableViewHolder(View convertView, int expandingLayoutResId) {
-        mExpandingLayoutResId = expandingLayoutResId;
-        expandingLayout = getExpandingLayoutSafely(convertView);
+        expandingLayout = expandingLayoutResId;
+        expandingLayoutViewGroup = getExpandingLayoutSafely(convertView);
     }
 
     public ExpandingLayout getExpandingLayoutSafely(View convertView) {
-        View expandingLayoutCandidate = convertView.findViewById(mExpandingLayoutResId);
+        View expandingLayoutCandidate = convertView.findViewById(expandingLayout);
         if (expandingLayoutCandidate == null || !(expandingLayoutCandidate instanceof ExpandingLayout)) {
             throw new IllegalStateException(
                     "ExpandingListAdapter should be provided with ExpandingLayout widget in its layout");

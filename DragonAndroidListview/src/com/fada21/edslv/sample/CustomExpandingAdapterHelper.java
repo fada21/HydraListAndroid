@@ -17,18 +17,9 @@
 package com.fada21.edslv.sample;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,55 +36,6 @@ public class CustomExpandingAdapterHelper extends ExpandingAdapterHelper<SampleL
         super(context, expandingLayoutRes);
     }
 
-    /**
-     * Crops a circle out of the thumbnail photo.
-     */
-    public Bitmap getCroppedBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
-
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        Canvas canvas = new Canvas(output);
-
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-
-        int halfWidth = bitmap.getWidth() / 2;
-        int halfHeight = bitmap.getHeight() / 2;
-
-        canvas.drawCircle(halfWidth, halfHeight, Math.max(halfWidth, halfHeight), paint);
-
-        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
-    }
-
-    @Override
-    public void setupCollapsedView(View convertView, final SampleListItem data) {
-        LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.item_linear_layout));
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
-                AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
-        linearLayout.setLayoutParams(linearLayoutParams);
-
-        TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
-        ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
-        imgView.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ctx, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
-
-        titleView.setText(data.getSc().getName() + " " + data.getNumber());
-        imgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(ctx.getResources(), data.getSc()
-                .getIconResId(), null)));
-
-    }
-
     @Override
     protected void setupExpandedView(View convertView, final SampleListItem data) {
         ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
@@ -101,15 +43,14 @@ public class CustomExpandingAdapterHelper extends ExpandingAdapterHelper<SampleL
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(ctx, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(context, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT).show();
             }
         });
         TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
-        expImgView.setImageBitmap(getCroppedBitmap(BitmapFactory.decodeResource(ctx.getResources(), data
-                .getSc().getIconResId(), null)));
-        textView.setText(ctx.getString(data.getSc().getTextResId()));
+        expImgView.setImageBitmap(SampleUtils.getCroppedBitmap(BitmapFactory.decodeResource(context.getResources(),
+                data.getSc().getIconResId(), null)));
+        textView.setText(context.getString(data.getSc().getTextResId()));
     }
 
 }

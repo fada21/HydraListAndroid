@@ -27,16 +27,15 @@ import com.fada21.edslv.data.HydraListItem;
  * It should also state if item is expandable with method {@link #isExpandable()}.
  * </p>
  */
-public abstract class ExpandableListItem implements OnSizeChangedListener, HydraListItem {
+public abstract class ExpandableListItem extends HydraListItem implements OnSizeChangedListener {
 
     private boolean mIsExpandable;
     private boolean mIsExpanded;
-    private int     mCollapsedHeight;
     private int     mExpandedHeight;
 
     public ExpandableListItem(int defaultCollapsedHeight, boolean isExpandable) {
+        super(defaultCollapsedHeight);
         mIsExpandable = isExpandable;
-        mCollapsedHeight = defaultCollapsedHeight;
         mIsExpanded = false;
         mExpandedHeight = -1;
     }
@@ -55,14 +54,6 @@ public abstract class ExpandableListItem implements OnSizeChangedListener, Hydra
 
     public void setExpanded(boolean isExpanded) {
         mIsExpanded = isExpanded;
-    }
-
-    public int getCollapsedHeight() {
-        return mCollapsedHeight;
-    }
-
-    public void setCollapsedHeight(int collapsedHeight) {
-        mCollapsedHeight = collapsedHeight;
     }
 
     public int getExpandedHeight() {

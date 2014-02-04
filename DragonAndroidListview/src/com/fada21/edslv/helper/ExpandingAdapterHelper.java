@@ -11,43 +11,28 @@ import com.fada21.edslv.util.HydraListConsts;
 
 public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends HydraAdapterHelper<T> {
 
-    protected final Context ctx;
-    private final int       expandingLayoutResId;
+    private final int       expandingLayout;
 
-    public ExpandingAdapterHelper(Context context, int expandingLayoutResId) {
-        super();
-        ctx = context;
-        this.expandingLayoutResId = expandingLayoutResId;
+    public ExpandingAdapterHelper(Context context, int expandingLayout) {
+        super(context);
+        this.expandingLayout = expandingLayout;
     }
 
-    public int getExpandingLayoutResId() {
-        return expandingLayoutResId;
+    public int getExpandingLayout() {
+        return expandingLayout;
     }
 
     @Override
     public void ensureCompliance() throws IllegalStateException {
-
-        if (expandingLayoutResId == HydraListConsts.UNSET) {
-            throw new IllegalStateException("Must provide resource id for expanding view (expandableResId)");
+        if (expandingLayout == HydraListConsts.UNSET) {
+            throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
         }
     }
 
-    /**
-     * Implement look of collapsed view of a list item
-     * 
-     * @param convertView
-     *            view to alter
-     * @param data
-     *            to be filled
-     * @param viewHelper
-     *            pattern for performance
-     */
-    public abstract void setupCollapsedView(View convertView, T data);
-
     public ExpandingLayout getExpandedView(View convertView, T data) {
         ExpandableListItem expData = (ExpandableListItem) data;
-        ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(expandingLayoutResId);
-        ExpandingLayout expandingLayout = viewHolder.expandingLayout;
+        ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(expandingLayout);
+        ExpandingLayout expandingLayout = viewHolder.expandingLayoutViewGroup;
         expandingLayout.setExpandedHeight(expData.getExpandedHeight());
         expandingLayout.setSizeChangedListener(expData);
 
