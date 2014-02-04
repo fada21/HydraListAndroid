@@ -45,7 +45,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <com.fada21.edslv.expandable.ExpandingLayout
+    <com.fada21.hydralist.expandable.ExpandingLayout
         android:id="@+id/expanding_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,6 +70,6 @@
             android:textColor="#ffffff"
             android:textSize="22sp"
             android:textStyle="bold" />
-    </com.fada21.edslv.expandable.ExpandingLayout>
+    </com.fada21.hydralist.expandable.ExpandingLayout>
 
 </LinearLayout>

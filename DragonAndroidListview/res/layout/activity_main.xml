@@ -1,4 +1,4 @@
-<com.fada21.edslv.HydraListView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fada21.hydralist.HydraListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_list_view"
     android:layout_width="match_parent"
