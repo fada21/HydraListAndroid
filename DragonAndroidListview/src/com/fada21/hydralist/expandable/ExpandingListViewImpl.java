@@ -86,19 +86,17 @@ public class ExpandingListViewImpl {
 
     /**
      * <p>
-     * Calculates the top and bottom bound changes of the selected item. These values are also used to move the bounds
-     * of the items around the one that is actually being expanded or collapsed.
+     * Calculates the top and bottom bound changes of the selected item. These values are also used to move the bounds of the items around the one that is
+     * actually being expanded or collapsed.
      * </p>
      * 
      * <p>
-     * This method can be modified to achieve different user experiences depending on how you want the cells to expand
-     * or collapse. In this specific demo, the cells always try to expand downwards (leaving top bound untouched), and
-     * similarly, collapse upwards (leaving top bound untouched). If the change in bounds results in the complete
-     * disappearance of a cell, its lower bound is moved is moved to the top of the screen so as not to hide any
-     * additional content that the user has not interacted with yet. Furthermore, if the collapsed cell is partially off
-     * screen when it is first clicked, it is translated such that its full contents are visible. Lastly, this behavior
-     * varies slightly near the bottom of the listview in order to account for the fact that the bottom bounds of the
-     * actual listview cannot be modified.
+     * This method can be modified to achieve different user experiences depending on how you want the cells to expand or collapse. In this specific demo, the
+     * cells always try to expand downwards (leaving top bound untouched), and similarly, collapse upwards (leaving top bound untouched). If the change in
+     * bounds results in the complete disappearance of a cell, its lower bound is moved is moved to the top of the screen so as not to hide any additional
+     * content that the user has not interacted with yet. Furthermore, if the collapsed cell is partially off screen when it is first clicked, it is translated
+     * such that its full contents are visible. Lastly, this behavior varies slightly near the bottom of the listview in order to account for the fact that the
+     * bottom bounds of the actual listview cannot be modified.
      * </p>
      */
     private int[] getTopAndBottomTranslations(int top, int bottom, int yDelta, boolean isExpanding) {
@@ -122,13 +120,18 @@ public class ExpandingListViewImpl {
             int offset = nlv.computeVerticalScrollOffset();
             int range = nlv.computeVerticalScrollRange();
             int extent = nlv.computeVerticalScrollExtent();
-            int leftoverExtent = range - offset - extent;
 
-            boolean isCollapsingBelowBottom = (yTranslateBottom > leftoverExtent);
-            boolean isCellCompletelyDisappearing = bottom - yTranslateBottom < 0;
+            boolean isListFilled = range >= extent;
+
+            float pixelsConvertion = (float) nlv.getHeight() / (float) extent;
+
+            int allowedToShinkTop = (int) (offset * pixelsConvertion);
+            int allowedToShinkBottom = (int) ((range - offset - extent) * pixelsConvertion);
+            boolean isCollapsingBelowBottom = isListFilled && yTranslateBottom > allowedToShinkBottom;
+            boolean isCellCompletelyDisappearing = bottom - yDelta - yTranslateBottom < 0;
 
             if (isCollapsingBelowBottom) {
-                yTranslateTop = yTranslateBottom - leftoverExtent;
+                yTranslateTop = Math.min(allowedToShinkTop, yTranslateBottom);
                 yTranslateBottom = yDelta - yTranslateTop;
             } else if (isCellCompletelyDisappearing) {
                 yTranslateBottom = bottom;
@@ -141,38 +144,34 @@ public class ExpandingListViewImpl {
 
     /**
      * <p>
-     * This method expands the view that was clicked and animates all the views around it to make room for the expanding
-     * view. There are several steps required to do this which are outlined below.
+     * This method expands the view that was clicked and animates all the views around it to make room for the expanding view. There are several steps required
+     * to do this which are outlined below.
      * </p>
      * 
-     * <li>Store the current top and bottom bounds of each visible item in the listview.</li> <li>Update the layout
-     * parameters of the selected view. In the context of this method, the view should be originally collapsed and set
-     * to some custom height. The layout parameters are updated so as to wrap the content of the additional text that is
-     * to be displayed.</li>
+     * <li>Store the current top and bottom bounds of each visible item in the listview.</li> <li>Update the layout parameters of the selected view. In the
+     * context of this method, the view should be originally collapsed and set to some custom height. The layout parameters are updated so as to wrap the
+     * content of the additional text that is to be displayed.</li>
      * 
      * <br/>
      * <br/>
      * <p>
-     * After invoking a layout to take place, the listview will order all the items such that there is space for each
-     * view. This layout will be independent of what the bounds of the items were prior to the layout so two pre-draw
-     * passes will be made. This is necessary because after the layout takes place, some views that were visible before
-     * the layout may now be off bounds but a reference to these views is required so the animation completes as
-     * intended.
+     * After invoking a layout to take place, the listview will order all the items such that there is space for each view. This layout will be independent of
+     * what the bounds of the items were prior to the layout so two pre-draw passes will be made. This is necessary because after the layout takes place, some
+     * views that were visible before the layout may now be off bounds but a reference to these views is required so the animation completes as intended.
      * </p>
      * <br/>
      * 
-     * <li>The first predraw pass will set the bounds of all the visible items to their original location before the
-     * layout took place and then force another layout. Since the bounds of the cells cannot be set directly, the method
-     * setSelectionFromTop can be used to achieve a very similar effect.</li> <li>The expanding view's bounds are
-     * animated to what the final values should be from the original bounds.</li> <li>The bounds above the expanding
-     * view are animated upwards while the bounds below the expanding view are animated downwards.</li> <li>The extra
-     * text is faded in as its contents become visible throughout the animation process.</li>
+     * <li>The first predraw pass will set the bounds of all the visible items to their original location before the layout took place and then force another
+     * layout. Since the bounds of the cells cannot be set directly, the method setSelectionFromTop can be used to achieve a very similar effect.</li> <li>The
+     * expanding view's bounds are animated to what the final values should be from the original bounds.</li> <li>The bounds above the expanding view are
+     * animated upwards while the bounds below the expanding view are animated downwards.</li> <li>The extra text is faded in as its contents become visible
+     * throughout the animation process.</li>
      * 
      * <br/>
      * <br/>
      * <p>
-     * It is important to note that the listview is disabled during the animation because the scrolling behavior is
-     * unpredictable if the bounds of the items within the listview are not constant during the scroll.
+     * It is important to note that the listview is disabled during the animation because the scrolling behavior is unpredictable if the bounds of the items
+     * within the listview are not constant during the scroll.
      * </p>
      * <br/>
      * 
@@ -368,15 +367,13 @@ public class ExpandingListViewImpl {
      * around it to close around the collapsing view. There are several steps required
      * to do this which are outlined below.
      * 
-     * <li>Update the layout parameters of the view clicked so as to minimize its height to the original collapsed
-     * (default) state.</li> <li>After invoking a layout, the listview will shift all the cells so as to display them
-     * most efficiently. Therefore, during the first predraw pass, the listview must be offset by some amount such that
-     * given the custom bound change upon collapse, all the cells that need to be on the screen after the layout are
-     * rendered by the listview.</li> <li>On the second predraw pass, all the items are first returned to their original
-     * location (before the first layout).</li> <li>The collapsing view's bounds are animated to what the final values
-     * should be.</li> <li>The bounds above the collapsing view are animated downwards while the bounds below the
-     * collapsing view are animated upwards.</li> <li>The extra text is faded out as its contents become visible
-     * throughout the animation process.</li>
+     * <li>Update the layout parameters of the view clicked so as to minimize its height to the original collapsed (default) state.</li> <li>After invoking a
+     * layout, the listview will shift all the cells so as to display them most efficiently. Therefore, during the first predraw pass, the listview must be
+     * offset by some amount such that given the custom bound change upon collapse, all the cells that need to be on the screen after the layout are rendered by
+     * the listview.</li> <li>On the second predraw pass, all the items are first returned to their original location (before the first layout).</li> <li>The
+     * collapsing view's bounds are animated to what the final values should be.</li> <li>The bounds above the collapsing view are animated downwards while the
+     * bounds below the collapsing view are animated upwards.</li> <li>The extra text is faded out as its contents become visible throughout the animation
+     * process.</li>
      * 
      * @param view
      *            collapsing view
@@ -492,7 +489,7 @@ public class ExpandingListViewImpl {
                     }
                 }
 
-                final View expandingLayout = view.findViewById(R.id.expanding_layout);
+                final View expandingLayout = view.findViewById(getExpandingAdapter().getExpandingHelper().getExpandingLayout());
 
                 /* Animates all the cells present on the screen after the collapse. */
                 ArrayList<Animator> animations = new ArrayList<Animator>();
@@ -500,7 +497,8 @@ public class ExpandingListViewImpl {
                     View v = nlv.getChildAt(i);
                     if (v != view) {
                         float diff = i > index ? -yTranslateBottom : yTranslateTop;
-                        animations.add(getAnimation(v, diff, diff));
+                        if (diff != 0f)
+                            animations.add(getAnimation(v, diff, diff));
                     }
                 }
 
