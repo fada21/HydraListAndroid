@@ -39,7 +39,7 @@ import com.fada21.hydralist.util.PublicListView;
  * A custom listview which supports the preview of extra content corresponding to each cell
  * by clicking on the cell to hide and show the extra content.
  */
-public class ExpandingListViewImpl {
+public class ExpandingListViewDelegate {
 
     private boolean              mShouldRemoveObserver = false;
 
@@ -49,7 +49,7 @@ public class ExpandingListViewImpl {
 
     private final PublicListView nlv;
 
-    public ExpandingListViewImpl(PublicListView nlv) {
+    public ExpandingListViewDelegate(PublicListView nlv) {
         this.nlv = nlv;
         init();
     }

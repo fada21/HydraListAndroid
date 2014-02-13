@@ -7,17 +7,17 @@ import android.view.MotionEvent;
 import android.widget.ListAdapter;
 
 import com.fada21.hydralist.data.HydraListItem;
-import com.fada21.hydralist.dragable.DragableListViewImpl;
-import com.fada21.hydralist.expandable.ExpandingListViewImpl;
+import com.fada21.hydralist.dragable.DragableListViewDelegate;
+import com.fada21.hydralist.expandable.ExpandingListViewDelegate;
 import com.fada21.hydralist.util.PublicListView;
 
 /**
  * <p>
  * Provides various custom ListViews behavior and effects with animations. Behavior is switched on/off by supplied adapter triggering methods:
  * <li>
- * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewImpl}</li>
+ * {@link #setExpandable()} - to switch expanding effects implemented in {@link ExpandingListViewDelegate}</li>
  * <li>
- * {@link #setDragable()} - to switch expandable effects implemented in {@link DragableListViewImpl}</li>
+ * {@link #setDragable()} - to switch expandable effects implemented in {@link DragableListViewDelegate}</li>
  * </p>
  * 
  * <br/>
@@ -30,8 +30,8 @@ public class HydraListView extends PublicListView {
     private boolean               isExpandable      = false;
     private boolean               isDragable        = false;
 
-    private ExpandingListViewImpl expandingListView = null;
-    private DragableListViewImpl  dragableListView  = null;
+    private ExpandingListViewDelegate expandingListView = null;
+    private DragableListViewDelegate  dragableListView  = null;
 
     // ====== standard constructors
 
@@ -59,7 +59,7 @@ public class HydraListView extends PublicListView {
 
     public void setExpandable(boolean isExpandable) {
         if (isExpandable) {
-            expandingListView = new ExpandingListViewImpl(this);
+            expandingListView = new ExpandingListViewDelegate(this);
         } else {
             expandingListView = null;
         }
@@ -68,7 +68,7 @@ public class HydraListView extends PublicListView {
 
     public void setDragable(boolean isDragable) {
         if (isDragable) {
-            dragableListView = new DragableListViewImpl(this);
+            dragableListView = new DragableListViewDelegate(this);
         } else {
             dragableListView = null;
         }

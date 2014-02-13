@@ -65,7 +65,7 @@ import static com.fada21.hydralist.util.HydraListConsts.INVALID;
  * When the hover cell is either above or below the bounds of the listview, this
  * listview also scrolls on its own so as to reveal additional content.
  */
-public class DragableListViewImpl {
+public class DragableListViewDelegate {
 
     private final int            SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
     private final int            MOVE_DURATION                = 150;
@@ -97,7 +97,7 @@ public class DragableListViewImpl {
 
     private final PublicListView nlv;
 
-    public DragableListViewImpl(PublicListView nlv) {
+    public DragableListViewDelegate(PublicListView nlv) {
         this.nlv = nlv;
         init(nlv.getContext());
     }
