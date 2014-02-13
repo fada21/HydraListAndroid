@@ -11,9 +11,8 @@
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
-     limitations under the License.
+     limitations under the License. 
 -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,7 +44,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <com.fada21.hydralist.expandable.ExpandingLayout
+    <com.fada21.android.hydralist.expandable.ExpandingLayout
         android:id="@+id/expanding_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,6 +69,6 @@
             android:textColor="#ffffff"
             android:textSize="22sp"
             android:textStyle="bold" />
-    </com.fada21.hydralist.expandable.ExpandingLayout>
+    </com.fada21.android.hydralist.expandable.ExpandingLayout>
 
 </LinearLayout>
