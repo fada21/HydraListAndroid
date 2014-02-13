@@ -5,15 +5,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fada21.hydralist.data.HydraListDataProvider;
 import com.fada21.hydralist.data.HydraListItem;
 import com.fada21.hydralist.util.HydraListConsts;
 
-public abstract class BaseAdapterHelper<T extends HydraListItem> extends HydraAdapterHelper<T> {
+/**
+ * Plain adapter that servers common adapter tasks besides of expansion adapter helpers
+ */
+public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
 
     private final int            itemLayout;
     private final LayoutInflater inflater;
 
-    public BaseAdapterHelper(Context ctx, int itemLayout) {
+    public PlainAdapterHelper(Context ctx, int itemLayout) {
         super(ctx);
         inflater = LayoutInflater.from(context);
         this.itemLayout = itemLayout;
@@ -29,7 +33,7 @@ public abstract class BaseAdapterHelper<T extends HydraListItem> extends HydraAd
     }
 
     @Override
-    public void ensureCompliance() throws IllegalArgumentException {
+    public void ensureCompliance(HydraListDataProvider<T> dataProvider) throws IllegalArgumentException {
 
         if (itemLayout == HydraListConsts.UNSET && itemLayout > 0) {
             throw new IllegalStateException("Must provide resource id for item view (itemLayout)");

@@ -9,12 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fada21.hydralist.sample.R;
-import com.fada21.hydralist.helper.BaseAdapterHelper;
+import com.fada21.hydralist.helper.PlainAdapterHelper;
 
-public class SampleBaseAdapterHelper extends BaseAdapterHelper<SampleListItem> {
+public class SamplePlainAdapterHelper extends PlainAdapterHelper<SampleListItem> {
 
-    public SampleBaseAdapterHelper(Context ctx, int itemLayout) {
+    public SamplePlainAdapterHelper(Context ctx, int itemLayout) {
         super(ctx, itemLayout);
     }
 

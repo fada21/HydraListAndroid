@@ -3,10 +3,11 @@ package com.fada21.hydralist.dragable;
 import static com.fada21.hydralist.util.HydraListConsts.UNSET;
 import android.content.Context;
 
+import com.fada21.hydralist.data.HydraListDataProvider;
 import com.fada21.hydralist.data.HydraListItem;
-import com.fada21.hydralist.helper.HydraAdapterHelper;
+import com.fada21.hydralist.helper.HydraListAdapterHelper;
 
-public class DragableAdapterHelper<T extends HydraListItem> extends HydraAdapterHelper<T> {
+public class DragableAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
 
     private final int allowedRangeStartPosition;
     private final int allowedRangeEndPosition;
@@ -38,8 +39,15 @@ public class DragableAdapterHelper<T extends HydraListItem> extends HydraAdapter
     }
 
     @Override
-    public void ensureCompliance() throws IllegalArgumentException {
-        // nothing to implement
-    }
+    public void ensureCompliance(HydraListDataProvider<T> dataProvider) throws IllegalStateException {
+        if (allowedRangeStartPosition < UNSET) {
+            throw new IllegalStateException("Defined allowedRangeStartPosition must be nonnegative");
+        } else if (allowedRangeEndPosition < allowedRangeStartPosition) {
+            throw new IllegalStateException("Defined allowedRangeStartPosition must be greater than allowedRangeEndPosition");
+        }
 
+        if (!(dataProvider instanceof Dragable)) {
+            throw new IllegalStateException("Data provider must implement Dragable interface!");
+        }
+    }
 }

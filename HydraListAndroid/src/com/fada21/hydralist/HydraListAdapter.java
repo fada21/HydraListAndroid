@@ -9,17 +9,16 @@ import android.widget.ListView;
 
 import com.fada21.hydralist.data.HydraListDataProvider;
 import com.fada21.hydralist.data.HydraListItem;
-import com.fada21.hydralist.dragable.Dragable;
 import com.fada21.hydralist.dragable.DragableAdapterHelper;
 import com.fada21.hydralist.expandable.ExpandingAdapterHelper;
-import com.fada21.hydralist.helper.BaseAdapterHelper;
-import com.fada21.hydralist.helper.HydraAdapterHelper;
+import com.fada21.hydralist.helper.PlainAdapterHelper;
+import com.fada21.hydralist.helper.HydraListAdapterHelper;
 import com.fada21.hydralist.util.HydraListConsts;
 
 /**
  * 
  * <p>
- * Adapter for {@link HydraListView}. It works as container for various behaviors implemented in helpers which extends {@link HydraAdapterHelper}.
+ * Adapter for {@link HydraListView}. It works as container for various behaviors implemented in helpers which extends {@link HydraListAdapterHelper}.
  * </p>
  * <p>
  * Adapter class cannot be extended. In order to extends adapter and implement extra views, animations or behavior one must extends one of the helpers which is
@@ -37,7 +36,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 
     protected final int                       itemLayout;
 
-    private final BaseAdapterHelper<T>        baseAdapterHelper;
+    private final PlainAdapterHelper<T>        baseAdapterHelper;
     protected final ExpandingAdapterHelper<T> expandingHelper;
     protected final DragableAdapterHelper<T>  dragableHelper;
 
@@ -66,7 +65,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
      *            only for parameterization
      * @return HydraBuilder for constructing HydraList Adapter
      */
-    public static <BT extends HydraListItem> Builder<BT> builder(BaseAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
+    public static <BT extends HydraListItem> Builder<BT> builder(PlainAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
         return new Builder<BT>(baseAdapterHelper);
     }
 
@@ -74,11 +73,11 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 
         private HydraListDataProvider<BT>  dataProvider;
 
-        private BaseAdapterHelper<BT>      baseAdapterHelper      = null;
+        private PlainAdapterHelper<BT>      baseAdapterHelper      = null;
         private ExpandingAdapterHelper<BT> expandingAdapterHelper = null;
         private DragableAdapterHelper<BT>  dragableAdapterHelper  = null;
 
-        public Builder(BaseAdapterHelper<BT> helper) {
+        public Builder(PlainAdapterHelper<BT> helper) {
             this.baseAdapterHelper = helper;
         }
 
@@ -117,7 +116,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
         return dragableHelper != null;
     }
 
-    public BaseAdapterHelper<T> getBaseAdapterHelper() {
+    public PlainAdapterHelper<T> getBaseAdapterHelper() {
         return baseAdapterHelper;
     }
 
@@ -130,28 +129,23 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
     }
 
     /**
-     * Checks for general compliance, and if helpers are properly initialized
+     * Checks for general compliance, and if helpers are properly initialized. Therefore should be invoked after object was built.
      * 
      * @param helpers
      */
-    private void ensureCompliance(HydraAdapterHelper<T>... helpers) {
-        if (helpers.length > 0) {
-            for (HydraAdapterHelper<T> hydraAdapterHelper : helpers) {
-                if (hydraAdapterHelper != null) {
-                    hydraAdapterHelper.ensureCompliance();
-                }
-            }
-        }
-
+    private void ensureCompliance(HydraListAdapterHelper<T>... helpers) throws IllegalStateException {
         if (baseAdapterHelper == null) {
             throw new IllegalStateException("BaseAdapterHelper instance must be provided!");
         }
 
-        if (isDragable()) {
-            if (!(dataProvider instanceof Dragable)) {
-                throw new IllegalStateException("Data provider must implement Dragable interface!");
+        if (helpers.length > 0) {
+            for (HydraListAdapterHelper<T> hydraAdapterHelper : helpers) {
+                if (hydraAdapterHelper != null) {
+                    hydraAdapterHelper.ensureCompliance(dataProvider);
+                }
             }
         }
+
     }
 
     public HydraListDataProvider<T> getDataProvider() {
@@ -176,7 +170,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
     @Override
     public long getItemId(int position) {
         if (position < 0 || position >= dataProvider.size()) {
-            return HydraListConsts.INVALID;
+            return HydraListConsts.INVALID_ID;
         } else {
             return dataProvider.get(position).getId();
         }
