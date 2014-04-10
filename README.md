@@ -18,3 +18,5 @@ TODO
  - sticky headers 
  - better samples
  - writing library expansion tutorial
+ - tests
+ - animated item delete
