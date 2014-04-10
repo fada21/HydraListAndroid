@@ -8,7 +8,7 @@ public class SampleListItem extends ExpandableListItem {
     private int            number;
 
     public SampleListItem(SampleContents sc, int number) {
-        super(sc.getDefHeight(), sc != SampleContents.ROCK);
+        super(sc.getDefHeight(), sc != SampleContents.MARINE);
         this.sc = sc;
         this.number = number;
     }

@@ -4,9 +4,9 @@ import static com.fada21.android.hydralist.sample.SampleConsts.CELL_DEFAULT_HEIG
 
 public enum SampleContents {
 
-    CHAMELEON("Chameleon", R.drawable.chameleon, CELL_DEFAULT_HEIGHT, R.string.short_lorem_ipsum),
-    ROCK("Rock", R.drawable.rock, CELL_DEFAULT_HEIGHT + 100, R.string.medium_lorem_ipsum),
-    FLOWER("Flower", R.drawable.flower, CELL_DEFAULT_HEIGHT, R.string.long_lorem_ipsum);
+    HYDRALISK("Hydralisk", R.drawable.hydralisk, CELL_DEFAULT_HEIGHT, R.string.short_lorem_ipsum),
+    MARINE("Marine", R.drawable.marine, CELL_DEFAULT_HEIGHT + 100, R.string.medium_lorem_ipsum),
+    ZEALOT("Zealot", R.drawable.zealot, CELL_DEFAULT_HEIGHT, R.string.long_lorem_ipsum);
 
     private final String name;
     private final int    iconResId;
