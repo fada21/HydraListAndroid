@@ -21,4 +21,10 @@
     <string name="medium_lorem_ipsum">Pellentesque dictum sit amet sapien in faucibus. Curabitur fermentum, nulla quis placerat imperdiet, est nisi placerat arcu, non ornare erat justo at enim. Nam vitae porttitor sem. Quisque non quam nisi. Proin quis urna id elit ultrices cursus non tempus dolor</string>
     <string name="long_lorem_ipsum">Mauris dapibus convallis massa, vitae ultrices est ultricies ut. Nam porttitor et metus ac bibendum. Nam at justo vitae felis lacinia ultrices laoreet ut arcu. Nam ac purus et turpis convallis mollis. Integer lorem eros, hendrerit imperdiet interdum vitae, sagittis eget ipsum. Donec dignissim tortor at felis fringilla, sed dignissim diam vulputate. Nam sit amet facilisis massa. Suspendisse posuere quam quis augue dapibus venenatis.</string>
 
+    <string-array name="units_urls">
+        <item>http://starcraft.wikia.com/wiki/Hydralisk_(StarCraft)</item>
+        <item>http://starcraft.wikia.com/wiki/Marine_(StarCraft)</item>
+        <item>http://starcraft.wikia.com/wiki/Zealot_(StarCraft)</item>
+    </string-array>
+
 </resources>
