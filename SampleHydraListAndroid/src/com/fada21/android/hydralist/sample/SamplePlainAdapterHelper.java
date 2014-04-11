@@ -1,7 +1,6 @@
 package com.fada21.android.hydralist.sample;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ImageView;
@@ -33,8 +32,7 @@ public class SamplePlainAdapterHelper extends com.fada21.android.hydralist.helpe
         });
 
         titleView.setText(data.getSc().getName() + " " + data.getNumber());
-        imgView.setImageBitmap(SampleUtils.getCroppedBitmap(BitmapFactory.decodeResource(context.getResources(), data
-                .getSc().getIconResId(), null)));
+        imgView.setImageResource(data.getSc().getIconResId());
     }
 
 }

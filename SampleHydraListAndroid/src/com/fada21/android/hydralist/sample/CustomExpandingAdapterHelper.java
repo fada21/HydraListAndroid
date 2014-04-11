@@ -17,7 +17,6 @@
 package com.fada21.android.hydralist.sample;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,8 +46,7 @@ public class CustomExpandingAdapterHelper extends ExpandingAdapterHelper<SampleL
         });
         TextView textView = (TextView) convertView.findViewById(R.id.text_view);
 
-        expImgView.setImageBitmap(SampleUtils.getCroppedBitmap(BitmapFactory.decodeResource(context.getResources(),
-                data.getSc().getIconResId(), null)));
+        expImgView.setImageResource(data.getSc().getIconResId());
         textView.setText(context.getString(data.getSc().getTextResId()));
     }
 
