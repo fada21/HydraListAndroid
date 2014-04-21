@@ -37,7 +37,7 @@ public enum SampleContents {
     }
     
     /**
-     * Tells which should expand. Protoss protect their secrets and won't expand to easly.
+     * Tells which should expand. Protoss protect their secrets and won't expand to easily.
      * @return <code>true</code> for expandable
      */
     public boolean isSampleExpandable() {
@@ -45,7 +45,7 @@ public enum SampleContents {
     }
     
     /**
-     * Tells which should be dragable. Terrans ones sieged is not to be dragged easly.
+     * Tells which should be dragable. Terrans ones sieged is not to be dragged easily.
      * @return
      */
     public boolean isDragable() {
