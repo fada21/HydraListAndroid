@@ -46,7 +46,7 @@ public class DragableAdapterHelper<T extends HydraListItem> extends HydraListAda
             throw new IllegalStateException("Defined allowedRangeStartPosition must be greater than allowedRangeEndPosition");
         }
 
-        if (!(dataProvider instanceof Dragable)) {
+        if (!(dataProvider instanceof IDragableAdapter)) {
             throw new IllegalStateException("Data provider must implement Dragable interface!");
         }
     }

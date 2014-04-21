@@ -152,6 +152,9 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
         return dataProvider;
     }
 
+    /**
+     * Important to force that in data set {@link HydraListDataProvider}
+     */
     @Override
     public boolean hasStableIds() {
         return true;

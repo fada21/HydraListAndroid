@@ -10,61 +10,61 @@ import com.fada21.android.hydralist.util.HydraListConsts;
 
 public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
 
-    private final int       expandingLayout;
+	private final int expandingLayout;
 
-    public ExpandingAdapterHelper(Context context, int expandingLayout) {
-        super(context);
-        this.expandingLayout = expandingLayout;
-    }
+	public ExpandingAdapterHelper(Context context, int expandingLayout) {
+		super(context);
+		this.expandingLayout = expandingLayout;
+	}
 
-    /**
-     * Provides id in layout in which expanding layout should be filled
-     * 
-     * @return view element id for expanding part
-     */
-    public int getExpandingLayout() {
-        return expandingLayout;
-    }
+	/**
+	 * Provides id in layout in which expanding layout should be filled
+	 * 
+	 * @return view element id for expanding part
+	 */
+	public int getExpandingLayout() {
+		return expandingLayout;
+	}
 
-    @Override
-    public void ensureCompliance(HydraListDataProvider<T> dataProvider) throws IllegalStateException {
-        if (expandingLayout == HydraListConsts.UNSET) {
-            throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
-        }
-    }
+	@Override
+	public void ensureCompliance(HydraListDataProvider<T> dataProvider) throws IllegalStateException {
+		if (expandingLayout == HydraListConsts.UNSET) {
+			throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
+		}
+	}
 
-    public void storeExpandableViewHolderAsTag(View convertView) {
-        ExpandableViewHolder viewHolder = new ExpandableViewHolder(convertView, getExpandingLayout());
-        convertView.setTag(getExpandingLayout(), viewHolder);
-    }
+	public void storeExpandableViewHolderAsTag(View convertView) {
+		ExpandableViewHolder viewHolder = new ExpandableViewHolder(convertView, getExpandingLayout());
+		convertView.setTag(getExpandingLayout(), viewHolder);
+	}
 
-    public ExpandingLayout getExpandedView(View convertView, final T data) {
-        ExpandableListItem expData = (ExpandableListItem) data;
-        ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(expandingLayout);
-        ExpandingLayout expandingLayout = viewHolder.expandingLayoutViewGroup;
-        expandingLayout.setExpandedHeight(expData.getExpandedHeight());
-        expandingLayout.setSizeChangedListener(expData);
+	public ExpandingLayout getExpandedView(View convertView, final T data) {
+		ExpandableListItem expData = (ExpandableListItem) data;
+		ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(expandingLayout);
+		ExpandingLayout expandingLayout = viewHolder.expandingLayoutViewGroup;
+		expandingLayout.setExpandedHeight(expData.getExpandedHeight());
+		expandingLayout.setSizeChangedListener(expData);
 
-        if (expData.isExpandable())
-            setupExpandedView(convertView, data);
+		if (expData.isExpandable())
+			setupExpandedView(convertView, data);
 
-        if (!expData.isExpanded()) {
-            expandingLayout.setVisibility(View.GONE);
-        } else {
-            expandingLayout.setVisibility(View.VISIBLE);
-        }
+		if (!expData.isExpanded()) {
+			expandingLayout.setVisibility(View.GONE);
+		} else {
+			expandingLayout.setVisibility(View.VISIBLE);
+		}
 
-        return expandingLayout;
-    }
+		return expandingLayout;
+	}
 
-    /**
-     * Implement look of expanded view of a list item
-     * 
-     * @param convertView
-     *            view to alter
-     * @param data
-     *            to be filled
-     */
-    protected abstract void setupExpandedView(View convertView, final T data);
+	/**
+	 * Implement look of expanded view of a list item
+	 * 
+	 * @param convertView
+	 *            view to alter
+	 * @param data
+	 *            to be filled
+	 */
+	protected abstract void setupExpandedView(View convertView, final T data);
 
 }

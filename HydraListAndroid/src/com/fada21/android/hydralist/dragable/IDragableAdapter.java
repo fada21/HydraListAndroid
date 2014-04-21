@@ -2,7 +2,7 @@ package com.fada21.android.hydralist.dragable;
 
 import android.widget.BaseAdapter;
 
-public interface Dragable {
+public interface IDragableAdapter {
     /**
      * Swaps elements in ordered adapter. Should invoke {@link BaseAdapter#notifyDataSetChanged()} after swap completed
      * 
