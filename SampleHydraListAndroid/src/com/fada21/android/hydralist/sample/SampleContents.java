@@ -35,5 +35,21 @@ public enum SampleContents {
     public int getTextResId() {
         return textResId;
     }
+    
+    /**
+     * Tells which should expand. Protoss protect their secrets and won't expand to easly.
+     * @return <code>true</code> for expandable
+     */
+    public boolean isSampleExpandable() {
+    	return this != ZEALOT;
+    }
+    
+    /**
+     * Tells which should be dragable. Terrans ones sieged is not to be dragged easly.
+     * @return
+     */
+    public boolean isDragable() {
+    	return this != MARINE;
+    }
 
 }

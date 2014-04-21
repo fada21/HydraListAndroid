@@ -38,9 +38,9 @@ import com.fada21.android.hydralist.dragable.DragableAdapterHelper;
  * back to the same location) until it is clicked again, at which point the cell collapses
  * back to its default state.
  */
-public class HydraListActivity extends Activity {
+public class SampleHydraListActivity extends Activity {
 
-    private final int     NUM_OF_CELLS = 6;
+    private final int     NUM_OF_CELLS = 23;
 
     private HydraListView mListView;
 
@@ -58,7 +58,9 @@ public class HydraListActivity extends Activity {
             mData.add(new SampleListItem(sc, i + 1));
         }
 
-        Builder<SampleListItem> builder = HydraListAdapter.builder(new SamplePlainAdapterHelper(this, R.layout.list_view_item), SampleListItem.class);
+        SamplePlainAdapterHelper plainAdapterHelper = new SamplePlainAdapterHelper(this, R.layout.list_view_item);
+        
+        Builder<SampleListItem> builder = HydraListAdapter.builder(plainAdapterHelper, SampleListItem.class);
         builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
         builder.dragable(new DragableAdapterHelper<SampleListItem>(this));
         builder.data(new SampleDataProvider(mData));
