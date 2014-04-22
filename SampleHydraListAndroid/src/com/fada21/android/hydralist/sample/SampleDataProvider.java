@@ -3,9 +3,9 @@ package com.fada21.android.hydralist.sample;
 import java.util.List;
 
 import com.fada21.android.hydralist.data.ListDataProvider;
-import com.fada21.android.hydralist.dragable.IDragableAdapter;
+import com.fada21.android.hydralist.dragable.Swappable;
 
-public class SampleDataProvider extends ListDataProvider<SampleListItem> implements IDragableAdapter {
+public class SampleDataProvider extends ListDataProvider<SampleListItem> implements Swappable {
 
 	public SampleDataProvider(List<SampleListItem> data) {
 		super(data);

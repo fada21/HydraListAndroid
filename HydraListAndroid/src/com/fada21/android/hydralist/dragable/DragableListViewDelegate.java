@@ -24,25 +24,25 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.HeaderViewListAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.fada21.android.hydralist.HydraListAdapter;
-import com.fada21.android.hydralist.HydraListView;
-import com.fada21.android.hydralist.util.HydraListConsts;
 import com.fada21.android.hydralist.util.PublicListView;
-
-import static com.fada21.android.hydralist.util.HydraListConsts.INVALID_ID;
 
 /**
  * The dynamic listview is an extension of listview that supports cell dragging and swapping.
@@ -59,11 +59,30 @@ import static com.fada21.android.hydralist.util.HydraListConsts.INVALID_ID;
  */
 public class DragableListViewDelegate {
 
+	private int mOriginalTranscriptMode;
+
+	public interface OnHoverCellListener {
+		public Drawable onHoverCellCreated(Drawable hoverCellDrawable);
+	}
+
+	/**
+	 * Implement this interface to be notified of ordering changes. Call
+	 * {@link #setOnItemMovedListener(com.nhaarman.listviewanimations.widget.DynamicListView.OnItemMovedListener)}.
+	 */
+	public interface OnItemMovedListener {
+		/**
+		 * Called after an item is dropped and moved.
+		 * 
+		 * @param newPosition
+		 *            the new position of the item.
+		 */
+		public void onItemMoved(int newPosition);
+	}
+
 	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
 	private final int MOVE_DURATION = 150;
-	private final int LINE_THICKNESS = 15;
 
-	private int mLastEventY = -1;
+	private int mLastEventY = -1, mLastEventX = -1;
 
 	private int mDownY = -1;
 	private int mDownX = -1;
@@ -74,18 +93,33 @@ public class DragableListViewDelegate {
 	private boolean mIsMobileScrolling = false;
 	private int mSmoothScrollAmountAtEdge = 0;
 
+	private final int INVALID_ID = -1;
 	private long mAboveItemId = INVALID_ID;
 	private long mMobileItemId = INVALID_ID;
 	private long mBelowItemId = INVALID_ID;
 
-	private BitmapDrawable mHoverCell;
+	private Drawable mHoverCell;
 	private Rect mHoverCellCurrentBounds;
 	private Rect mHoverCellOriginalBounds;
 
-	private int mActivePointerId = INVALID_ID;
+	private final int INVALID_POINTER_ID = -1;
+	private int mActivePointerId = INVALID_POINTER_ID;
 
 	private boolean mIsWaitingForScrollFinish = false;
-	private int mScrollState = ListView.OnScrollListener.SCROLL_STATE_IDLE;
+	private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
+
+	private OnTouchListener mOnTouchListener;
+	private boolean mIsParentHorizontalScrollContainer;
+	private int mResIdOfDynamicTouchChild;
+	private boolean mDynamicTouchChildTouched;
+	private int mSlop;
+
+	private boolean mSkipCallingOnTouchListener;
+
+	private OnHoverCellListener mOnHoverCellListener;
+
+	private OnItemMovedListener mOnItemMovedListener;
+	private int mLastMovedToIndex;
 
 	private final PublicListView nlv;
 
@@ -112,34 +146,24 @@ public class DragableListViewDelegate {
 
 	private AdapterView.OnItemLongClickListener initOnItemLongClickListener() {
 		return new AdapterView.OnItemLongClickListener() {
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-				mTotalOffset = 0;
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				int position = nlv.pointToPosition(mDownX, mDownY);
-				int itemNum = position - nlv.getFirstVisiblePosition();
-
-				View selectedView = nlv.getChildAt(itemNum);
-
-				ListAdapter adapter = nlv.getAdapter();
-				if (!isDragable(position, adapter)) {
+				if (!isDragable(position)) {
 					return false;
 				}
 
-				mMobileItemId = adapter.getItemId(position);
-				mHoverCell = getAndAddHoverView(selectedView);
-				selectedView.setVisibility(View.INVISIBLE);
-
-				mCellIsMobile = true;
-
-				updateNeighborViewsForID(mMobileItemId);
-
-				return true;
+				if (mResIdOfDynamicTouchChild == 0) {
+					mDynamicTouchChildTouched = true;
+					makeCellMobile();
+					return true;
+				}
+				return false;
 			}
 
-			private boolean isDragable(int position, ListAdapter adapter) {
+			private boolean isDragable(int position) {
 				boolean isDragable = true;
 				try {
-					IDragableListItem item = (IDragableListItem) adapter.getItem(position);
+					Dragable item = (Dragable) getAdapter().getItem(position);
 					isDragable = item.isDragable();
 				} catch (ClassCastException cce) {
 					// assume that all items should be dragable
@@ -149,18 +173,43 @@ public class DragableListViewDelegate {
 		};
 	}
 
+	private void makeCellMobile() {
+		int position = nlv.pointToPosition(mDownX, mDownY);
+		int itemNum = position - nlv.getFirstVisiblePosition();
+		View selectedView = nlv.getChildAt(itemNum);
+		if (selectedView == null || position < nlv.getHeaderViewsCount() || position >= getAdapter().getCount() - nlv.getHeaderViewsCount()) {
+			return;
+		}
+
+		mOriginalTranscriptMode = nlv.getTranscriptMode();
+		nlv.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+
+		mTotalOffset = 0;
+
+		mMobileItemId = getAdapter().getItemId(position);
+		mHoverCell = getAndAddHoverView(selectedView);
+		if (mOnHoverCellListener != null) {
+			mHoverCell = mOnHoverCellListener.onHoverCellCreated(mHoverCell);
+		}
+		selectedView.setVisibility(View.INVISIBLE);
+
+		mCellIsMobile = true;
+		nlv.getParent().requestDisallowInterceptTouchEvent(true);
+
+		updateNeighborViewsForId(mMobileItemId);
+	}
+
 	/**
 	 * Creates the hover cell with the appropriate bitmap and of appropriate size. The hover cell's BitmapDrawable is drawn on top of the bitmap every single
 	 * time an invalidate call is made.
 	 */
 	private BitmapDrawable getAndAddHoverView(View v) {
-
 		int w = v.getWidth();
 		int h = v.getHeight();
 		int top = v.getTop();
 		int left = v.getLeft();
 
-		Bitmap b = getBitmapWithBorder(v);
+		Bitmap b = getBitmapFromView(v);
 
 		BitmapDrawable drawable = new BitmapDrawable(nlv.getResources(), b);
 
@@ -172,25 +221,9 @@ public class DragableListViewDelegate {
 		return drawable;
 	}
 
-	/** Draws a black border over the screenshot of the view passed in. */
-	private Bitmap getBitmapWithBorder(View v) {
-		Bitmap bitmap = getBitmapFromView(v);
-		Canvas can = new Canvas(bitmap);
-
-		Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-		Paint paint = new Paint();
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(LINE_THICKNESS);
-		paint.setColor(Color.BLACK);
-
-		can.drawBitmap(bitmap, 0, 0, null);
-		can.drawRect(rect, paint);
-
-		return bitmap;
-	}
-
-	/** Returns a bitmap showing a screenshot of the view passed in. */
+	/**
+	 * Returns a bitmap showing a screenshot of the view passed in.
+	 */
 	private Bitmap getBitmapFromView(View v) {
 		Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
@@ -202,31 +235,45 @@ public class DragableListViewDelegate {
 	 * Stores a reference to the views above and below the item currently corresponding to the hover cell. It is important to note that if this item is either
 	 * at the top or bottom of the list, mAboveItemId or mBelowItemId may be invalid.
 	 */
-	private void updateNeighborViewsForID(long itemID) {
-		int position = getPositionForID(itemID);
+	private void updateNeighborViewsForId(long itemId) {
+		int position = getPositionForId(itemId);
 		ListAdapter adapter = getAdapter();
-		mAboveItemId = adapter.getItemId(position - 1);
-		mBelowItemId = adapter.getItemId(position + 1);
+		if (!adapter.hasStableIds()) {
+			throw new IllegalStateException(
+					"Adapter doesn't have stable ids! Make sure your adapter has stable ids, and override hasStableIds() to return true.");
+		}
+
+		mAboveItemId = position - 1 >= 0 ? adapter.getItemId(position - 1) : ListView.INVALID_ROW_ID;
+		mBelowItemId = position + 1 < adapter.getCount() ? adapter.getItemId(position + 1) : ListView.INVALID_ROW_ID;
 	}
 
-	/** Retrieves the view in the list corresponding to itemID */
-	public View getViewForID(long itemID) {
+	/**
+	 * Retrieves the view in the list corresponding to itemId
+	 */
+	private View getViewForId(long itemId) {
 		int firstVisiblePosition = nlv.getFirstVisiblePosition();
 		ListAdapter adapter = getAdapter();
+		if (!adapter.hasStableIds()) {
+			throw new IllegalStateException(
+					"Adapter doesn't have stable ids! Make sure your adapter has stable ids, and override hasStableIds() to return true.");
+		}
+
 		for (int i = 0; i < nlv.getChildCount(); i++) {
 			View v = nlv.getChildAt(i);
 			int position = firstVisiblePosition + i;
 			long id = adapter.getItemId(position);
-			if (id == itemID) {
+			if (id == itemId) {
 				return v;
 			}
 		}
 		return null;
 	}
 
-	/** Retrieves the position in the list corresponding to itemID */
-	public int getPositionForID(long itemID) {
-		View v = getViewForID(itemID);
+	/**
+	 * Retrieves the position in the list corresponding to itemId
+	 */
+	private int getPositionForId(long itemId) {
+		View v = getViewForId(itemId);
 		if (v == null) {
 			return -1;
 		} else {
@@ -244,23 +291,100 @@ public class DragableListViewDelegate {
 		}
 	}
 
+	/**
+	 * used for swipeto dissmiss
+	 * 
+	 * @param l
+	 */
+	public void setOnTouchListener(OnTouchListener l) {
+		mOnTouchListener = l;
+	}
+
+	public void setOnHoverCellListener(OnHoverCellListener onHoverCellListener) {
+		mOnHoverCellListener = onHoverCellListener;
+	}
+
+	private Rect getChildViewRect(View parentView, View childView) {
+		final Rect childRect = new Rect(childView.getLeft(), childView.getTop(), childView.getRight(), childView.getBottom());
+		if (parentView == childView) {
+			return childRect;
+		}
+
+		ViewGroup parent;
+		while ((parent = (ViewGroup) childView.getParent()) != parentView) {
+			childRect.offset(parent.getLeft(), parent.getTop());
+			childView = parent;
+		}
+
+		return childRect;
+	}
+
 	public boolean onTouchEvent(MotionEvent event) {
+		if (mSkipCallingOnTouchListener) {
+			return false;
+		}
+
+		//        if (mOnTouchListener instanceof SwipeOnTouchListener) {
+		//            if (((SwipeOnTouchListener) mOnTouchListener).isSwiping()) {
+		//                mSkipCallingOnTouchListener = true;
+		//                boolean retVal = mOnTouchListener.onTouch(this, event);
+		//                mSkipCallingOnTouchListener = false;
+		//                return retVal || nlv.onTouchEvent(event);
+		//            }
+		//        }
 
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			mDownX = (int) event.getX();
 			mDownY = (int) event.getY();
 			mActivePointerId = event.getPointerId(0);
+
+			mDynamicTouchChildTouched = false;
+			if (mResIdOfDynamicTouchChild != 0) {
+				mIsParentHorizontalScrollContainer = false;
+
+				int position = nlv.pointToPosition(mDownX, mDownY);
+				int childNum = (position != ListView.INVALID_POSITION) ? position - nlv.getFirstVisiblePosition() : -1;
+				View itemView = (childNum >= 0) ? nlv.getChildAt(childNum) : null;
+				View childView = (itemView != null) ? itemView.findViewById(mResIdOfDynamicTouchChild) : null;
+				if (childView != null) {
+					final Rect childRect = getChildViewRect(nlv, childView);
+					if (childRect.contains(mDownX, mDownY)) {
+						mDynamicTouchChildTouched = true;
+						nlv.getParent().requestDisallowInterceptTouchEvent(true);
+					}
+				}
+			}
+
+			if (mIsParentHorizontalScrollContainer) {
+				// Do it now and don't wait until the user moves more than the
+				// slop factor.
+				nlv.getParent().requestDisallowInterceptTouchEvent(true);
+			}
 			break;
 		case MotionEvent.ACTION_MOVE:
-			if (mActivePointerId == INVALID_ID) {
+			if (mActivePointerId == INVALID_POINTER_ID) {
 				break;
 			}
 
 			int pointerIndex = event.findPointerIndex(mActivePointerId);
 
 			mLastEventY = (int) event.getY(pointerIndex);
+			mLastEventX = (int) event.getX(pointerIndex);
 			int deltaY = mLastEventY - mDownY;
+			int deltaX = mLastEventX - mDownX;
+
+			if (!mCellIsMobile && mDynamicTouchChildTouched) {
+				if (Math.abs(deltaY) > mSlop && Math.abs(deltaY) > Math.abs(deltaX)) {
+					makeCellMobile();
+
+					// Cancel ListView's touch (un-highlighting the item)
+					//MotionEvent cancelEvent = MotionEvent.obtain(event);
+					//cancelEvent.setAction(MotionEvent.ACTION_CANCEL | (event.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+					//onTouchEvent(cancelEvent);
+					//cancelEvent.recycle();
+				}
+			}
 
 			if (mCellIsMobile) {
 				mHoverCellCurrentBounds.offsetTo(mHoverCellOriginalBounds.left, mHoverCellOriginalBounds.top + deltaY + mTotalOffset);
@@ -271,14 +395,14 @@ public class DragableListViewDelegate {
 
 				mIsMobileScrolling = false;
 				handleMobileCellScroll();
-
-				return false;
 			}
 			break;
 		case MotionEvent.ACTION_UP:
+			mDynamicTouchChildTouched = false;
 			touchEventsEnded();
 			break;
 		case MotionEvent.ACTION_CANCEL:
+			mDynamicTouchChildTouched = false;
 			touchEventsCancelled();
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
@@ -291,11 +415,24 @@ public class DragableListViewDelegate {
 			pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 			final int pointerId = event.getPointerId(pointerIndex);
 			if (pointerId == mActivePointerId) {
+				mDynamicTouchChildTouched = false;
 				touchEventsEnded();
 			}
 			break;
 		default:
 			break;
+		}
+
+		if (mCellIsMobile) {
+			return false;
+		} else if (mOnTouchListener != null) {
+			mSkipCallingOnTouchListener = true;
+			// for swipedissmiss-> problably to erase
+			boolean retVal = mOnTouchListener.onTouch(nlv, event);
+			mSkipCallingOnTouchListener = false;
+			if (retVal) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -310,41 +447,54 @@ public class DragableListViewDelegate {
 		final int deltaY = mLastEventY - mDownY;
 		int deltaYTotal = mHoverCellOriginalBounds.top + mTotalOffset + deltaY;
 
-		View belowView = getViewForID(mBelowItemId);
-		View mobileView = getViewForID(mMobileItemId);
-		View aboveView = getViewForID(mAboveItemId);
+		View belowView = getViewForId(mBelowItemId);
+		View mobileView = getViewForId(mMobileItemId);
+		View aboveView = getViewForId(mAboveItemId);
 
 		boolean isBelow = (belowView != null) && (deltaYTotal > belowView.getTop());
 		boolean isAbove = (aboveView != null) && (deltaYTotal < aboveView.getTop());
 
 		if (isBelow || isAbove) {
 
-			final long switchItemID = isBelow ? mBelowItemId : mAboveItemId;
+			final long switchItemId = isBelow ? mBelowItemId : mAboveItemId;
 			View switchView = isBelow ? belowView : aboveView;
 			final int originalItem = nlv.getPositionForView(mobileView);
 
 			if (switchView == null) {
-				updateNeighborViewsForID(mMobileItemId);
+				updateNeighborViewsForId(mMobileItemId);
 				return;
 			}
 
-			swapElements(originalItem, nlv.getPositionForView(switchView));
+			int positionForView = nlv.getPositionForView(switchView);
+			if (positionForView < nlv.getHeaderViewsCount()) {
+				return;
+			}
+			swapElements(originalItem, positionForView);
+
+			BaseAdapter adapter;
+			if (getAdapter() instanceof HeaderViewListAdapter) {
+				adapter = (BaseAdapter) ((HeaderViewListAdapter) getAdapter()).getWrappedAdapter();
+			} else {
+				adapter = (BaseAdapter) getAdapter();
+			}
+			adapter.notifyDataSetChanged();
 
 			mDownY = mLastEventY;
+			mDownX = mLastEventX;
 
 			final int switchViewStartTop = switchView.getTop();
 
 			mobileView.setVisibility(View.VISIBLE);
 			switchView.setVisibility(View.INVISIBLE);
 
-			updateNeighborViewsForID(mMobileItemId);
+			updateNeighborViewsForId(mMobileItemId);
 
 			final ViewTreeObserver observer = nlv.getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				public boolean onPreDraw() {
 					observer.removeOnPreDrawListener(this);
 
-					View switchView = getViewForID(switchItemID);
+					View switchView = getViewForId(switchItemId);
 
 					mTotalOffset += deltaY;
 
@@ -353,7 +503,7 @@ public class DragableListViewDelegate {
 
 					switchView.setTranslationY(delta);
 
-					ObjectAnimator animator = ObjectAnimator.ofFloat(switchView, View.TRANSLATION_Y, 0);
+					ObjectAnimator animator = ObjectAnimator.ofFloat(switchView, "translationY", 0);
 					animator.setDuration(MOVE_DURATION);
 					animator.start();
 
@@ -365,7 +515,7 @@ public class DragableListViewDelegate {
 
 	private void swapElements(int indexOne, int indexTwo) {
 		HydraListAdapter<?> hlva = (HydraListAdapter<?>) getAdapter();
-		IDragableAdapter dataProvider = (IDragableAdapter) hlva.getDataProvider();
+		Swappable dataProvider = (Swappable) hlva.getDataProvider();
 		dataProvider.swap(indexOne, indexTwo);
 		hlva.notifyDataSetChanged();
 	}
@@ -374,17 +524,22 @@ public class DragableListViewDelegate {
 	 * Resets all the appropriate fields to a default state while also animating the hover cell back to its correct location.
 	 */
 	private void touchEventsEnded() {
-		final View mobileView = getViewForID(mMobileItemId);
+		final View mobileView = getViewForId(mMobileItemId);
 		if (mCellIsMobile || mIsWaitingForScrollFinish) {
 			mCellIsMobile = false;
 			mIsWaitingForScrollFinish = false;
 			mIsMobileScrolling = false;
-			mActivePointerId = INVALID_ID;
+			mActivePointerId = INVALID_POINTER_ID;
 
-			// If the autoscroller has not completed scrolling, we need to wait for it to
-			// finish in order to determine the final location of where the hover cell
+			/* Restore the transcript mode */
+			nlv.setTranscriptMode(mOriginalTranscriptMode);
+
+			// If the autoscroller has not completed scrolling, we need to wait
+			// for it to
+			// finish in order to determine the final location of where the
+			// hover cell
 			// should be animated to.
-			if (mScrollState != ListView.OnScrollListener.SCROLL_STATE_IDLE) {
+			if (mScrollState != OnScrollListener.SCROLL_STATE_IDLE) {
 				mIsWaitingForScrollFinish = true;
 				return;
 			}
@@ -413,6 +568,9 @@ public class DragableListViewDelegate {
 					mHoverCell = null;
 					nlv.setEnabled(true);
 					nlv.invalidate();
+					if (mOnItemMovedListener != null) {
+						mOnItemMovedListener.onItemMoved(mLastMovedToIndex - nlv.getHeaderViewsCount());
+					}
 				}
 			});
 			hoverViewAnimator.start();
@@ -425,7 +583,7 @@ public class DragableListViewDelegate {
 	 * Resets all the appropriate fields to a default state.
 	 */
 	private void touchEventsCancelled() {
-		View mobileView = getViewForID(mMobileItemId);
+		View mobileView = getViewForId(mMobileItemId);
 		if (mCellIsMobile) {
 			mAboveItemId = INVALID_ID;
 			mMobileItemId = INVALID_ID;
@@ -436,7 +594,7 @@ public class DragableListViewDelegate {
 		}
 		mCellIsMobile = false;
 		mIsMobileScrolling = false;
-		mActivePointerId = INVALID_ID;
+		mActivePointerId = INVALID_POINTER_ID;
 	}
 
 	/**
@@ -465,7 +623,7 @@ public class DragableListViewDelegate {
 	 * This method is in charge of determining if the hover cell is above or below the bounds of the listview. If so, the listview does an appropriate upward or
 	 * downward smooth scroll so as to reveal new items.
 	 */
-	public boolean handleMobileCellScroll(Rect r) {
+	private boolean handleMobileCellScroll(Rect r) {
 		int offset = nlv.computeVerticalScrollOffset();
 		int height = nlv.getHeight();
 		int extent = nlv.computeVerticalScrollExtent();
@@ -486,84 +644,101 @@ public class DragableListViewDelegate {
 		return false;
 	}
 
+	public void setIsParentHorizontalScrollContainer(boolean isParentHorizontalScrollContainer) {
+		mIsParentHorizontalScrollContainer = (mResIdOfDynamicTouchChild == 0) && isParentHorizontalScrollContainer;
+	}
+
+	public boolean isParentHorizontalScrollContainer() {
+		return mIsParentHorizontalScrollContainer;
+	}
+
+	public void setDynamicTouchChild(int childResId) {
+		mResIdOfDynamicTouchChild = childResId;
+		if (childResId != 0) {
+			setIsParentHorizontalScrollContainer(false);
+		}
+	}
+
 	/**
 	 * This scroll listener is added to the listview in order to handle cell swapping when the cell is either at the top or bottom edge of the listview. If the
 	 * hover cell is at either edge of the listview, the listview will begin scrolling. As scrolling takes place, the listview continuously checks if new cells
 	 * became visible and determines whether they are potential candidates for a cell swap.
 	 */
-	private AbsListView.OnScrollListener mScrollListener = getOnScrollListener();
+	private OnScrollListener mScrollListener = new OnScrollListener() {
 
-	private AbsListView.OnScrollListener getOnScrollListener() {
-		return new AbsListView.OnScrollListener() {
+		private int mPreviousFirstVisibleItem = -1;
+		private int mPreviousVisibleItemCount = -1;
+		private int mCurrentFirstVisibleItem;
+		private int mCurrentVisibleItemCount;
+		private int mCurrentScrollState;
 
-			private int mPreviousFirstVisibleItem = -1;
-			private int mPreviousVisibleItemCount = -1;
-			private int mCurrentFirstVisibleItem;
-			private int mCurrentVisibleItemCount;
-			private int mCurrentScrollState;
+		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			mCurrentFirstVisibleItem = firstVisibleItem;
+			mCurrentVisibleItemCount = visibleItemCount;
 
-			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				mCurrentFirstVisibleItem = firstVisibleItem;
-				mCurrentVisibleItemCount = visibleItemCount;
+			mPreviousFirstVisibleItem = (mPreviousFirstVisibleItem == -1) ? mCurrentFirstVisibleItem : mPreviousFirstVisibleItem;
+			mPreviousVisibleItemCount = (mPreviousVisibleItemCount == -1) ? mCurrentVisibleItemCount : mPreviousVisibleItemCount;
 
-				mPreviousFirstVisibleItem = (mPreviousFirstVisibleItem == -1) ? mCurrentFirstVisibleItem : mPreviousFirstVisibleItem;
-				mPreviousVisibleItemCount = (mPreviousVisibleItemCount == -1) ? mCurrentVisibleItemCount : mPreviousVisibleItemCount;
+			checkAndHandleFirstVisibleCellChange();
+			checkAndHandleLastVisibleCellChange();
 
-				checkAndHandleFirstVisibleCellChange();
-				checkAndHandleLastVisibleCellChange();
+			mPreviousFirstVisibleItem = mCurrentFirstVisibleItem;
+			mPreviousVisibleItemCount = mCurrentVisibleItemCount;
+		}
 
-				mPreviousFirstVisibleItem = mCurrentFirstVisibleItem;
-				mPreviousVisibleItemCount = mCurrentVisibleItemCount;
-			}
+		@Override
+		public void onScrollStateChanged(AbsListView view, int scrollState) {
+			mCurrentScrollState = scrollState;
+			mScrollState = scrollState;
+			isScrollCompleted();
+		}
 
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				mCurrentScrollState = scrollState;
-				mScrollState = scrollState;
-				isScrollCompleted();
-			}
-
-			/**
-			 * This method is in charge of invoking 1 of 2 actions. Firstly, if the listview is in a state of scrolling invoked by the hover cell being outside
-			 * the bounds of the listview, then this scrolling event is continued. Secondly, if the hover cell has already been released, this invokes the
-			 * animation for the hover cell to return to its correct position after the listview has entered an idle scroll state.
-			 */
-			private void isScrollCompleted() {
-				if (mCurrentVisibleItemCount > 0 && mCurrentScrollState == SCROLL_STATE_IDLE) {
-					if (mCellIsMobile && mIsMobileScrolling) {
-						handleMobileCellScroll();
-					} else if (mIsWaitingForScrollFinish) {
-						touchEventsEnded();
-					}
+		/**
+		 * This method is in charge of invoking 1 of 2 actions. Firstly, if the listview is in a state of scrolling invoked by the hover cell being outside the
+		 * bounds of the listview, then this scrolling event is continued. Secondly, if the hover cell has already been released, this invokes the animation for
+		 * the hover cell to return to its correct position after the listview has entered an idle scroll state.
+		 */
+		private void isScrollCompleted() {
+			if (mCurrentVisibleItemCount > 0 && mCurrentScrollState == SCROLL_STATE_IDLE) {
+				if (mCellIsMobile && mIsMobileScrolling) {
+					handleMobileCellScroll();
+				} else if (mIsWaitingForScrollFinish) {
+					touchEventsEnded();
 				}
 			}
+		}
 
-			/**
-			 * Determines if the listview scrolled up enough to reveal a new cell at the top of the list. If so, then the appropriate parameters are updated.
-			 */
-			public void checkAndHandleFirstVisibleCellChange() {
-				if (mCurrentFirstVisibleItem != mPreviousFirstVisibleItem) {
-					if (mCellIsMobile && mMobileItemId != INVALID_ID) {
-						updateNeighborViewsForID(mMobileItemId);
-						handleCellSwitch();
-					}
+		/**
+		 * Determines if the listview scrolled up enough to reveal a new cell at the top of the list. If so, then the appropriate parameters are updated.
+		 */
+		public void checkAndHandleFirstVisibleCellChange() {
+			if (mCurrentFirstVisibleItem != mPreviousFirstVisibleItem) {
+				if (mCellIsMobile && mMobileItemId != INVALID_ID) {
+					updateNeighborViewsForId(mMobileItemId);
+					handleCellSwitch();
 				}
 			}
+		}
 
-			/**
-			 * Determines if the listview scrolled down enough to reveal a new cell at the bottom of the list. If so, then the appropriate parameters are
-			 * updated.
-			 */
-			public void checkAndHandleLastVisibleCellChange() {
-				int currentLastVisibleItem = mCurrentFirstVisibleItem + mCurrentVisibleItemCount;
-				int previousLastVisibleItem = mPreviousFirstVisibleItem + mPreviousVisibleItemCount;
-				if (currentLastVisibleItem != previousLastVisibleItem) {
-					if (mCellIsMobile && mMobileItemId != INVALID_ID) {
-						updateNeighborViewsForID(mMobileItemId);
-						handleCellSwitch();
-					}
+		/**
+		 * Determines if the listview scrolled down enough to reveal a new cell at the bottom of the list. If so, then the appropriate parameters are updated.
+		 */
+		public void checkAndHandleLastVisibleCellChange() {
+			int currentLastVisibleItem = mCurrentFirstVisibleItem + mCurrentVisibleItemCount;
+			int previousLastVisibleItem = mPreviousFirstVisibleItem + mPreviousVisibleItemCount;
+			if (currentLastVisibleItem != previousLastVisibleItem) {
+				if (mCellIsMobile && mMobileItemId != INVALID_ID) {
+					updateNeighborViewsForId(mMobileItemId);
+					handleCellSwitch();
 				}
 			}
-		};
+		}
+	};
+
+	/**
+	 * Set the {@link com.nhaarman.listviewanimations.widget.DynamicListView.OnItemMovedListener} to be notified when an item is dropped.
+	 */
+	public void setOnItemMovedListener(OnItemMovedListener onItemMovedListener) {
+		this.mOnItemMovedListener = onItemMovedListener;
 	}
 }
