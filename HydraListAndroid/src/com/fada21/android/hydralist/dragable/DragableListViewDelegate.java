@@ -409,7 +409,7 @@ public class DragableListViewDelegate {
 
 			final long switchItemId = isBelow ? mBelowItemId : mAboveItemId;
 			View switchView = isBelow ? belowView : aboveView;
-			final int originalItem = nlv.getPositionForView(mobileView);
+			final int originalItem = mobileView !=null ? nlv.getPositionForView(mobileView) : INVALID_POSITION; 
 
 			if (switchView == null) {
 				updateNeighborViewsForId(mMobileItemId);
