@@ -79,7 +79,7 @@ public class DragableListViewDelegate {
 		public void onItemMoved(int newPosition);
 	}
 
-	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
+	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 30;
 	private final int MOVE_DURATION = 150;
 
 	private int mLastEventY = -1, mLastEventX = -1;
@@ -108,13 +108,10 @@ public class DragableListViewDelegate {
 	private boolean mIsWaitingForScrollFinish = false;
 	private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
 
-	private OnTouchListener mOnTouchListener;
 	private boolean mIsParentHorizontalScrollContainer;
 	private int mResIdOfDynamicTouchChild;
 	private boolean mDynamicTouchChildTouched;
 	private int mSlop;
-
-	private boolean mSkipCallingOnTouchListener;
 
 	private OnHoverCellListener mOnHoverCellListener;
 
@@ -291,15 +288,6 @@ public class DragableListViewDelegate {
 		}
 	}
 
-	/**
-	 * used for swipeto dissmiss
-	 * 
-	 * @param l
-	 */
-	public void setOnTouchListener(OnTouchListener l) {
-		mOnTouchListener = l;
-	}
-
 	public void setOnHoverCellListener(OnHoverCellListener onHoverCellListener) {
 		mOnHoverCellListener = onHoverCellListener;
 	}
@@ -320,19 +308,6 @@ public class DragableListViewDelegate {
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
-		if (mSkipCallingOnTouchListener) {
-			return false;
-		}
-
-		//        if (mOnTouchListener instanceof SwipeOnTouchListener) {
-		//            if (((SwipeOnTouchListener) mOnTouchListener).isSwiping()) {
-		//                mSkipCallingOnTouchListener = true;
-		//                boolean retVal = mOnTouchListener.onTouch(this, event);
-		//                mSkipCallingOnTouchListener = false;
-		//                return retVal || nlv.onTouchEvent(event);
-		//            }
-		//        }
-
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			mDownX = (int) event.getX();
@@ -377,12 +352,6 @@ public class DragableListViewDelegate {
 			if (!mCellIsMobile && mDynamicTouchChildTouched) {
 				if (Math.abs(deltaY) > mSlop && Math.abs(deltaY) > Math.abs(deltaX)) {
 					makeCellMobile();
-
-					// Cancel ListView's touch (un-highlighting the item)
-					//MotionEvent cancelEvent = MotionEvent.obtain(event);
-					//cancelEvent.setAction(MotionEvent.ACTION_CANCEL | (event.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
-					//onTouchEvent(cancelEvent);
-					//cancelEvent.recycle();
 				}
 			}
 
@@ -424,17 +393,10 @@ public class DragableListViewDelegate {
 		}
 
 		if (mCellIsMobile) {
+			return true;
+		} else {
 			return false;
-		} else if (mOnTouchListener != null) {
-			mSkipCallingOnTouchListener = true;
-			// for swipedissmiss-> problably to erase
-			boolean retVal = mOnTouchListener.onTouch(nlv, event);
-			mSkipCallingOnTouchListener = false;
-			if (retVal) {
-				return true;
-			}
 		}
-		return false;
 	}
 
 	/**
