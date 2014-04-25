@@ -1,6 +1,6 @@
 package com.fada21.android.hydralist.sample;
 
-import com.fada21.android.hydralist.dragable.Dragable;
+import com.fada21.android.hydralist.dragable.interfaces.Dragable;
 import com.fada21.android.hydralist.expandable.ExpandableListItem;
 
 public class SampleListItem extends ExpandableListItem implements Dragable {

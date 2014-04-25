@@ -3,7 +3,7 @@ package com.fada21.android.hydralist.sample;
 import java.util.List;
 
 import com.fada21.android.hydralist.data.ListDataProvider;
-import com.fada21.android.hydralist.dragable.Swappable;
+import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 
 public class SampleDataProvider extends ListDataProvider<SampleListItem> implements Swappable {
 

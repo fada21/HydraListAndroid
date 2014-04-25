@@ -132,37 +132,27 @@ public class DragableListViewDelegate {
 		return new AdapterView.OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				if (!isDragable(position)) {
-					return false;
-				}
-
 				if (mResIdOfDynamicTouchChild == 0) {
 					mDynamicTouchChildTouched = true;
-					makeCellMobile();
-					return true;
+					mCellIsMobile = makeCellMobile();
+					return mCellIsMobile;
 				}
 				return false;
 			}
 
-			private boolean isDragable(int position) {
-				boolean isDragable = true;
-				try {
-					Dragable item = (Dragable) getAdapter().getItem(position);
-					isDragable = item.isDragable();
-				} catch (ClassCastException cce) {
-					// assume that all items should be dragable
-				}
-				return isDragable;
-			}
 		};
 	}
 
-	private void makeCellMobile() {
+	private boolean makeCellMobile() {
 		int position = nlv.pointToPosition(mDownX, mDownY);
+		if (!isDragable(position)) {
+			return false;
+		}
+		
 		int itemNum = position - nlv.getFirstVisiblePosition();
 		View selectedView = nlv.getChildAt(itemNum);
 		if (selectedView == null || position < nlv.getHeaderViewsCount() || position >= getAdapter().getCount() - nlv.getHeaderViewsCount()) {
-			return;
+			return false;
 		}
 
 		mOriginalTranscriptMode = nlv.getTranscriptMode();
@@ -177,10 +167,22 @@ public class DragableListViewDelegate {
 		}
 		selectedView.setVisibility(View.INVISIBLE);
 
-		mCellIsMobile = true;
 		nlv.getParent().requestDisallowInterceptTouchEvent(true);
 
 		updateNeighborViewsForId(mMobileItemId);
+		
+		return true;
+	}
+	
+	private boolean isDragable(int position) {
+		boolean isDragable = true;
+		try {
+			Dragable item = (Dragable) getAdapter().getItem(position);
+			isDragable = item.isDragable();
+		} catch (ClassCastException cce) {
+			// assume that all items should be dragable
+		}
+		return isDragable;
 	}
 
 	/**
@@ -330,14 +332,15 @@ public class DragableListViewDelegate {
 
 			int pointerIndex = event.findPointerIndex(mActivePointerId);
 
-			mLastEventY = (int) event.getY(pointerIndex);
 			mLastEventX = (int) event.getX(pointerIndex);
-			int deltaY = mLastEventY - mDownY;
+			mLastEventY = (int) event.getY(pointerIndex);
 			int deltaX = mLastEventX - mDownX;
+			int deltaY = mLastEventY - mDownY;
 
 			if (!mCellIsMobile && mDynamicTouchChildTouched) {
 				if (Math.abs(deltaY) > mSlop && Math.abs(deltaY) > Math.abs(deltaX)) {
-					makeCellMobile();
+					mCellIsMobile = makeCellMobile();
+					mDynamicTouchChildTouched = mCellIsMobile;
 				}
 			}
 
