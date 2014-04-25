@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.fada21.android.hydralist.data.HydraListDataProvider;
 import com.fada21.android.hydralist.data.HydraListItem;
+import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 
 public class DragableAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {

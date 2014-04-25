@@ -57,7 +57,7 @@ public abstract class PublicListView extends ListView {
         super.onFinishInflate();
     }
 
-    // =============== non public AbsListView methods made public
+    // =============== nonpublic AbsListView methods made public
 
     @Override
     public int computeVerticalScrollExtent() {

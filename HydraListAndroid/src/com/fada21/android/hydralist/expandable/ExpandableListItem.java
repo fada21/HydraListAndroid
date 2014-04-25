@@ -17,6 +17,7 @@
 package com.fada21.android.hydralist.expandable;
 
 import com.fada21.android.hydralist.data.HydraListItem;
+import com.fada21.android.hydralist.expandable.interfaces.OnSizeChangedListener;
 
 /**
  * <p>

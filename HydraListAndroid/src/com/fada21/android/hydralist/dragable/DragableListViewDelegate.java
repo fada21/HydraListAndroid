@@ -42,10 +42,15 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.fada21.android.hydralist.HydraListAdapter;
+import com.fada21.android.hydralist.dragable.interfaces.Dragable;
+import com.fada21.android.hydralist.dragable.interfaces.OnItemMovedListener;
+import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.util.PublicListView;
 
+import static com.fada21.android.hydralist.dragable.DragableConsts.*;
+
 /**
- * The dynamic listview is an extension of listview that supports cell dragging and swapping.
+ * The dragable listview is an extension of listview that supports cell dragging and swapping.
  * 
  * This layout is in charge of positioning the hover cell in the correct location on the screen in response to user touch events. It uses the position of the
  * hover cell to determine when two cells should be swapped. If two cells should be swapped, all the corresponding data set and layout changes are handled here.
@@ -65,24 +70,8 @@ public class DragableListViewDelegate {
 		public Drawable onHoverCellCreated(Drawable hoverCellDrawable);
 	}
 
-	/**
-	 * Implement this interface to be notified of ordering changes. Call
-	 * {@link #setOnItemMovedListener(com.nhaarman.listviewanimations.widget.DynamicListView.OnItemMovedListener)}.
-	 */
-	public interface OnItemMovedListener {
-		/**
-		 * Called after an item is dropped and moved.
-		 * 
-		 * @param newPosition
-		 *            the new position of the item.
-		 */
-		public void onItemMoved(int newPosition);
-	}
-
-	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 30;
-	private final int MOVE_DURATION = 150;
-
-	private int mLastEventY = -1, mLastEventX = -1;
+	private int mLastEventX = -1;
+	private int mLastEventY = -1; 
 
 	private int mDownY = -1;
 	private int mDownX = -1;
@@ -93,7 +82,6 @@ public class DragableListViewDelegate {
 	private boolean mIsMobileScrolling = false;
 	private int mSmoothScrollAmountAtEdge = 0;
 
-	private final int INVALID_ID = -1;
 	private long mAboveItemId = INVALID_ID;
 	private long mMobileItemId = INVALID_ID;
 	private long mBelowItemId = INVALID_ID;
@@ -102,7 +90,6 @@ public class DragableListViewDelegate {
 	private Rect mHoverCellCurrentBounds;
 	private Rect mHoverCellOriginalBounds;
 
-	private final int INVALID_POINTER_ID = -1;
 	private int mActivePointerId = INVALID_POINTER_ID;
 
 	private boolean mIsWaitingForScrollFinish = false;
@@ -332,8 +319,7 @@ public class DragableListViewDelegate {
 			}
 
 			if (mIsParentHorizontalScrollContainer) {
-				// Do it now and don't wait until the user moves more than the
-				// slop factor.
+				// Do it now and don't wait until the user moves more than the slop factor.
 				nlv.getParent().requestDisallowInterceptTouchEvent(true);
 			}
 			break;
@@ -468,7 +454,7 @@ public class DragableListViewDelegate {
 					ObjectAnimator animator = ObjectAnimator.ofFloat(switchView, "translationY", 0);
 					animator.setDuration(MOVE_DURATION);
 					animator.start();
-
+					
 					return true;
 				}
 			});
@@ -698,7 +684,7 @@ public class DragableListViewDelegate {
 	};
 
 	/**
-	 * Set the {@link com.nhaarman.listviewanimations.widget.DynamicListView.OnItemMovedListener} to be notified when an item is dropped.
+	 * Set listener to be notified when an item is dropped.
 	 */
 	public void setOnItemMovedListener(OnItemMovedListener onItemMovedListener) {
 		this.mOnItemMovedListener = onItemMovedListener;

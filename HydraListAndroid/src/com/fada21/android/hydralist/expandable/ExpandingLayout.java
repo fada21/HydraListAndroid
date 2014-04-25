@@ -16,6 +16,8 @@
 
 package com.fada21.android.hydralist.expandable;
 
+import com.fada21.android.hydralist.expandable.interfaces.OnSizeChangedListener;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;

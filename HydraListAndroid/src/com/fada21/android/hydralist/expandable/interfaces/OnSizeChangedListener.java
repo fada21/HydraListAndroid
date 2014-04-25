@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fada21.android.hydralist.expandable;
+package com.fada21.android.hydralist.expandable.interfaces;
 
 /**
  * A listener used to update the list data object when the corresponding expanding

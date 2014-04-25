@@ -1,4 +1,4 @@
-package com.fada21.android.hydralist.dragable;
+package com.fada21.android.hydralist.dragable.interfaces;
 
 import android.widget.BaseAdapter;
 
