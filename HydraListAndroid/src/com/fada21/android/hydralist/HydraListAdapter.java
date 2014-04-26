@@ -196,23 +196,23 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final T data = dataProvider.get(position);
 
+		boolean isConvertViewNullAtFirst = convertView == null;
+		
+		if (isConvertViewNullAtFirst) {
+			convertView = plainAdapterHelper.newView(parent);
+		}
+		plainAdapterHelper.setupPlainView(convertView, data);
+		
 		if (isExpandable()) {
-			if (convertView == null) {
-				convertView = plainAdapterHelper.newView(parent);
+			if (isConvertViewNullAtFirst) {
 				expandingHelper.storeExpandableViewHolderAsTag(convertView);
 			}
-			plainAdapterHelper.setupPlainView(convertView, data);
 			expandingHelper.getExpandedView(convertView, (Expandable)data);
-		} else {
-			if (convertView == null) {
-				convertView = plainAdapterHelper.newView(parent);
-			}
-			plainAdapterHelper.setupPlainView(convertView, data);
-		}
+		} 
 
-		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
-		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
-		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
+//		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
+//		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
+//		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
 
 		return convertView;
 	}

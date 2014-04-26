@@ -38,6 +38,7 @@ public abstract class BasicExpandableListItem implements Expandable {
 	private final OnSizeChangedListener mOnSizeCHangeListener;
 
 	public BasicExpandableListItem(int defaultCollapsedHeight, boolean isExpandable) {
+		mCollapsedHeight = defaultCollapsedHeight;
 		mIsExpandable = isExpandable;
 		mIsExpanded = false;
 		mExpandedHeight = -1;
