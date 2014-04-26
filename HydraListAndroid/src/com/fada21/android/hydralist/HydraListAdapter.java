@@ -32,176 +32,179 @@ import com.fada21.android.hydralist.util.HydraListConsts;
  */
 public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter {
 
-    protected final HydraListDataProvider<T>  dataProvider;
+	protected final HydraListDataProvider<T> dataProvider;
 
-    protected final int                       itemLayout;
+	protected final int itemLayout;
 
-    private final PlainAdapterHelper<T>        baseAdapterHelper;
-    protected final ExpandingAdapterHelper<T> expandingHelper;
-    protected final DragableAdapterHelper<T>  dragableHelper;
+	private final PlainAdapterHelper<T> plainAdapterHelper;
+	protected final ExpandingAdapterHelper<T> expandingHelper;
+	protected final DragableAdapterHelper<T> dragableHelper;
 
-    @SuppressWarnings("unchecked")
-    private HydraListAdapter(Builder<T> b) {
-        dataProvider = b.dataProvider;
+	@SuppressWarnings("unchecked")
+	private HydraListAdapter(Builder<T> b) {
+		dataProvider = b.dataProvider;
 
-        itemLayout = b.baseAdapterHelper.getItemLayout();
+		itemLayout = b.baseAdapterHelper.getItemLayout();
 
-        baseAdapterHelper = b.baseAdapterHelper;
-        expandingHelper = b.expandingAdapterHelper;
-        dragableHelper = b.dragableAdapterHelper;
+		plainAdapterHelper = b.baseAdapterHelper;
+		expandingHelper = b.expandingAdapterHelper;
+		dragableHelper = b.dragableAdapterHelper;
 
-        ensureCompliance(baseAdapterHelper, expandingHelper, dragableHelper);
-    }
+		ensureCompliance(plainAdapterHelper, expandingHelper, dragableHelper);
+	}
 
-    /**
-     * Initiates builder for adapter
-     * 
-     * @param <BT>
-     *            generic parameter for {@link Builder}
-     * 
-     * @param itemLayout
-     *            - layout to inflate for the view
-     * @param clazz
-     *            only for parameterization
-     * @return HydraBuilder for constructing HydraList Adapter
-     */
-    public static <BT extends HydraListItem> Builder<BT> builder(PlainAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
-        return new Builder<BT>(baseAdapterHelper);
-    }
+	/**
+	 * Initiates builder for adapter
+	 * 
+	 * @param <BT>
+	 *            generic parameter for {@link Builder}
+	 * 
+	 * @param itemLayout
+	 *            - layout to inflate for the view
+	 * @param clazz
+	 *            only for parameterization
+	 * @return HydraBuilder for constructing HydraList Adapter
+	 */
+	public static <BT extends HydraListItem> Builder<BT> builder(PlainAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
+		return new Builder<BT>(baseAdapterHelper);
+	}
 
-    public static class Builder<BT extends HydraListItem> {
+	public static class Builder<BT extends HydraListItem> {
 
-        private HydraListDataProvider<BT>  dataProvider;
+		private HydraListDataProvider<BT> dataProvider;
 
-        private PlainAdapterHelper<BT>      baseAdapterHelper      = null;
-        private ExpandingAdapterHelper<BT> expandingAdapterHelper = null;
-        private DragableAdapterHelper<BT>  dragableAdapterHelper  = null;
+		private PlainAdapterHelper<BT> baseAdapterHelper = null;
+		private ExpandingAdapterHelper<BT> expandingAdapterHelper = null;
+		private DragableAdapterHelper<BT> dragableAdapterHelper = null;
 
-        public Builder(PlainAdapterHelper<BT> helper) {
-            this.baseAdapterHelper = helper;
-        }
+		public Builder(PlainAdapterHelper<BT> helper) {
+			this.baseAdapterHelper = helper;
+		}
 
-        public Builder<BT> data(HydraListDataProvider<BT> dataProvider) {
-            this.dataProvider = dataProvider;
-            return this;
-        }
+		public Builder<BT> data(HydraListDataProvider<BT> dataProvider) {
+			this.dataProvider = dataProvider;
+			return this;
+		}
 
-        public Builder<BT> data(Cursor cursor) {
-            throw new IllegalArgumentException("Cursors not yet supported");
-        }
+		public Builder<BT> data(Cursor cursor) {
+			throw new IllegalArgumentException("Cursors not yet supported");
+		}
 
-        public Builder<BT> expandable(ExpandingAdapterHelper<BT> helper) {
-            expandingAdapterHelper = helper;
-            return this;
-        }
+		public Builder<BT> expandable(ExpandingAdapterHelper<BT> helper) {
+			expandingAdapterHelper = helper;
+			return this;
+		}
 
-        public Builder<BT> dragable(DragableAdapterHelper<BT> helper) {
-            dragableAdapterHelper = helper;
-            return this;
-        }
+		public Builder<BT> dragable(DragableAdapterHelper<BT> helper) {
+			dragableAdapterHelper = helper;
+			return this;
+		}
 
-        public HydraListAdapter<BT> build() {
-            return new HydraListAdapter<BT>(this);
-        }
+		public HydraListAdapter<BT> build() {
+			return new HydraListAdapter<BT>(this);
+		}
 
-    }
+	}
 
-    // ====== Behavior switchers
+	// ====== Behavior switchers =================================
 
-    public boolean isExpandable() {
-        return expandingHelper != null;
-    }
+	// ====== basic plain adapter helper, must be present ========
+	public PlainAdapterHelper<T> getPlainAdapterHelper() {
+		return plainAdapterHelper;
+	}
 
-    public boolean isDragable() {
-        return dragableHelper != null;
-    }
+	// ====== expanding functionality ============================
+	public boolean isExpandable() {
+		return expandingHelper != null;
+	}
 
-    public PlainAdapterHelper<T> getBaseAdapterHelper() {
-        return baseAdapterHelper;
-    }
+	public ExpandingAdapterHelper<T> getExpandingHelper() {
+		return expandingHelper;
+	}
 
-    public ExpandingAdapterHelper<T> getExpandingHelper() {
-        return expandingHelper;
-    }
+	// ====== dragable functionality =============================
+	public boolean isDragable() {
+		return dragableHelper != null;
+	}
 
-    public DragableAdapterHelper<T> getDragableHelper() {
-        return dragableHelper;
-    }
+	public DragableAdapterHelper<T> getDragableHelper() {
+		return dragableHelper;
+	}
 
-    /**
-     * Checks for general compliance, and if helpers are properly initialized. Therefore should be invoked after object was built.
-     * 
-     * @param helpers
-     */
-    private void ensureCompliance(HydraListAdapterHelper<T>... helpers) throws IllegalStateException {
-        if (baseAdapterHelper == null) {
-            throw new IllegalStateException("BaseAdapterHelper instance must be provided!");
-        }
+	/**
+	 * Checks for general compliance, and if helpers are properly initialized. Therefore should be invoked after object was built.
+	 * 
+	 * @param helpers
+	 */
+	private void ensureCompliance(HydraListAdapterHelper<T>... helpers) throws IllegalStateException {
+		if (plainAdapterHelper == null) {
+			throw new IllegalStateException("BaseAdapterHelper instance must be provided!");
+		}
 
-        if (helpers.length > 0) {
-            for (HydraListAdapterHelper<T> hydraAdapterHelper : helpers) {
-                if (hydraAdapterHelper != null) {
-                    hydraAdapterHelper.ensureCompliance(dataProvider);
-                }
-            }
-        }
+		if (helpers.length > 0) {
+			for (HydraListAdapterHelper<T> hydraAdapterHelper : helpers) {
+				if (hydraAdapterHelper != null) {
+					hydraAdapterHelper.ensureCompliance(dataProvider);
+				}
+			}
+		}
 
-    }
+	}
 
-    public HydraListDataProvider<T> getDataProvider() {
-        return dataProvider;
-    }
+	public HydraListDataProvider<T> getDataProvider() {
+		return dataProvider;
+	}
 
-    /**
-     * Important to force that in data set {@link HydraListDataProvider}
-     */
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
+	/**
+	 * Important to force that in data set {@link HydraListDataProvider}
+	 */
+	@Override
+	public boolean hasStableIds() {
+		return true;
+	}
 
-    @Override
-    public int getCount() {
-        return dataProvider.size();
-    }
+	@Override
+	public int getCount() {
+		return dataProvider.size();
+	}
 
-    @Override
-    public T getItem(int position) {
-        return dataProvider.get(position);
-    }
+	@Override
+	public T getItem(int position) {
+		return dataProvider.get(position);
+	}
 
-    @Override
-    public long getItemId(int position) {
-        if (position < 0 || position >= dataProvider.size()) {
-            return HydraListConsts.INVALID_ID;
-        } else {
-            return dataProvider.get(position).getId();
-        }
-    }
+	@Override
+	public long getItemId(int position) {
+		if (position < 0 || position >= dataProvider.size()) {
+			return HydraListConsts.INVALID_ID;
+		} else {
+			return dataProvider.get(position).getId();
+		}
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final T data = dataProvider.get(position);
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final T data = dataProvider.get(position);
 
-        if (isExpandable()) {
-            if (convertView == null) {
-                convertView = baseAdapterHelper.newView(parent);
-                expandingHelper.storeExpandableViewHolderAsTag(convertView);
-            }
-            baseAdapterHelper.setupCollapsedView(convertView, data);
-            expandingHelper.getExpandedView(convertView, data);
-        } else {
-            if (convertView == null) {
-                convertView = baseAdapterHelper.newView(parent);
-            }
-            baseAdapterHelper.setupCollapsedView(convertView, data);
-        }
+		if (isExpandable()) {
+			if (convertView == null) {
+				convertView = plainAdapterHelper.newView(parent);
+				expandingHelper.storeExpandableViewHolderAsTag(convertView);
+			}
+			plainAdapterHelper.setupCollapsedView(convertView, data);
+			expandingHelper.getExpandedView(convertView, data);
+		} else {
+			if (convertView == null) {
+				convertView = plainAdapterHelper.newView(parent);
+			}
+			plainAdapterHelper.setupCollapsedView(convertView, data);
+		}
 
-        int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
-        int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
-        convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
+		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
+		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
+		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
 
-        return convertView;
-    }
+		return convertView;
+	}
 
 }

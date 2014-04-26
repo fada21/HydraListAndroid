@@ -70,7 +70,7 @@ public class HydraListView extends PublicListView {
 		boolean isAdapterDragable = adapter.isDragable();
 		if (isAdapterDragable) {
 			dragableListView = new DragableListViewDelegate(this);
-			dragableListView.setDynamicTouchChild(adapter.getDragableHelper().getDragableTouchResId());
+			dragableListView.setDragableTouchResId(adapter.getDragableHelper().getDragableTouchResId());
 		} else {
 			dragableListView = null;
 		}

@@ -96,8 +96,8 @@ public class DragableListViewDelegate {
 	private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
 
 	private boolean mIsParentHorizontalScrollContainer;
-	private int mResIdOfDynamicTouchChild;
-	private boolean mDynamicTouchChildTouched;
+	private int mDragableTouchResId;
+	private boolean mIsTouchedDragableView;
 	private int mSlop;
 
 	private OnHoverCellListener mOnHoverCellListener;
@@ -132,8 +132,8 @@ public class DragableListViewDelegate {
 		return new AdapterView.OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				if (mResIdOfDynamicTouchChild == 0) {
-					mDynamicTouchChildTouched = true;
+				if (mDragableTouchResId == 0) {
+					mIsTouchedDragableView = true;
 					mCellIsMobile = makeCellMobile();
 					return mCellIsMobile;
 				}
@@ -303,18 +303,18 @@ public class DragableListViewDelegate {
 			mDownY = (int) event.getY();
 			mActivePointerId = event.getPointerId(0);
 
-			mDynamicTouchChildTouched = false;
-			if (mResIdOfDynamicTouchChild != 0) {
+			mIsTouchedDragableView = false;
+			if (mDragableTouchResId != 0) {
 				mIsParentHorizontalScrollContainer = false;
 
 				int position = nlv.pointToPosition(mDownX, mDownY);
 				int childNum = (position != ListView.INVALID_POSITION) ? position - nlv.getFirstVisiblePosition() : -1;
 				View itemView = (childNum >= 0) ? nlv.getChildAt(childNum) : null;
-				View childView = (itemView != null) ? itemView.findViewById(mResIdOfDynamicTouchChild) : null;
+				View childView = (itemView != null) ? itemView.findViewById(mDragableTouchResId) : null;
 				if (childView != null) {
 					final Rect childRect = getChildViewRect(nlv, childView);
 					if (childRect.contains(mDownX, mDownY)) {
-						mDynamicTouchChildTouched = true;
+						mIsTouchedDragableView = true;
 						nlv.getParent().requestDisallowInterceptTouchEvent(true);
 					}
 				}
@@ -337,10 +337,10 @@ public class DragableListViewDelegate {
 			int deltaX = mLastEventX - mDownX;
 			int deltaY = mLastEventY - mDownY;
 
-			if (!mCellIsMobile && mDynamicTouchChildTouched) {
+			if (!mCellIsMobile && mIsTouchedDragableView) {
 				if (Math.abs(deltaY) > mSlop && Math.abs(deltaY) > Math.abs(deltaX)) {
 					mCellIsMobile = makeCellMobile();
-					mDynamicTouchChildTouched = mCellIsMobile;
+					mIsTouchedDragableView = mCellIsMobile;
 				}
 			}
 
@@ -356,11 +356,11 @@ public class DragableListViewDelegate {
 			}
 			break;
 		case MotionEvent.ACTION_UP:
-			mDynamicTouchChildTouched = false;
+			mIsTouchedDragableView = false;
 			touchEventsEnded();
 			break;
 		case MotionEvent.ACTION_CANCEL:
-			mDynamicTouchChildTouched = false;
+			mIsTouchedDragableView = false;
 			touchEventsCancelled();
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
@@ -373,7 +373,7 @@ public class DragableListViewDelegate {
 			pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 			final int pointerId = event.getPointerId(pointerIndex);
 			if (pointerId == mActivePointerId) {
-				mDynamicTouchChildTouched = false;
+				mIsTouchedDragableView = false;
 				touchEventsEnded();
 			}
 			break;
@@ -596,16 +596,16 @@ public class DragableListViewDelegate {
 	}
 
 	public void setIsParentHorizontalScrollContainer(boolean isParentHorizontalScrollContainer) {
-		mIsParentHorizontalScrollContainer = (mResIdOfDynamicTouchChild == 0) && isParentHorizontalScrollContainer;
+		mIsParentHorizontalScrollContainer = (mDragableTouchResId == 0) && isParentHorizontalScrollContainer;
 	}
 
 	public boolean isParentHorizontalScrollContainer() {
 		return mIsParentHorizontalScrollContainer;
 	}
 
-	public void setDynamicTouchChild(int childResId) {
-		mResIdOfDynamicTouchChild = childResId;
-		if (childResId != 0) {
+	public void setDragableTouchResId(int resId) {
+		mDragableTouchResId = resId;
+		if (resId != 0) {
 			setIsParentHorizontalScrollContainer(false);
 		}
 	}
