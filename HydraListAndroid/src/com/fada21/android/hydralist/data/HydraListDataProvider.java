@@ -10,6 +10,8 @@ public interface HydraListDataProvider<T extends HydraListItem> {
     boolean empty();
 
     int size();
+    
+    Class<T> getHydraListItemType();
 
     T get(int index);
 

@@ -4,11 +4,11 @@ import android.content.Context;
 import android.view.View;
 
 import com.fada21.android.hydralist.data.HydraListDataProvider;
-import com.fada21.android.hydralist.data.HydraListItem;
+import com.fada21.android.hydralist.expandable.interfaces.Expandable;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 import com.fada21.android.hydralist.util.HydraListConsts;
 
-public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
+public abstract class ExpandingAdapterHelper<T extends Expandable> extends HydraListAdapterHelper<T> {
 
 	private final int expandingLayout;
 
@@ -31,6 +31,10 @@ public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends Hy
 		if (expandingLayout == HydraListConsts.UNSET) {
 			throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
 		}
+		
+		if (! Expandable.class.isAssignableFrom(dataProvider.getHydraListItemType())) {
+			throw new IllegalStateException("Data provider items must implement Expandable interface!");
+		}
 	}
 
 	public void storeExpandableViewHolderAsTag(View convertView) {
@@ -39,16 +43,15 @@ public abstract class ExpandingAdapterHelper<T extends HydraListItem> extends Hy
 	}
 
 	public ExpandingLayout getExpandedView(View convertView, final T data) {
-		ExpandableListItem expData = (ExpandableListItem) data;
 		ExpandableViewHolder viewHolder = (ExpandableViewHolder) convertView.getTag(expandingLayout);
 		ExpandingLayout expandingLayout = viewHolder.expandingLayoutViewGroup;
-		expandingLayout.setExpandedHeight(expData.getExpandedHeight());
-		expandingLayout.setSizeChangedListener(expData);
+		expandingLayout.setExpandedHeight(data.getExpandedHeight());
+		expandingLayout.setSizeChangedListener(data.getOnSizeChangedListener());
 
-		if (expData.isExpandable())
+		if (data.isExpandable())
 			setupExpandedView(convertView, data);
 
-		if (!expData.isExpanded()) {
+		if (!data.isExpanded()) {
 			expandingLayout.setVisibility(View.GONE);
 		} else {
 			expandingLayout.setVisibility(View.VISIBLE);

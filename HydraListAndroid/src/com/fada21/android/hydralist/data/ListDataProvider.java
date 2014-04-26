@@ -5,9 +5,16 @@ import java.util.List;
 public class ListDataProvider<T extends HydraListItem> implements HydraListDataProvider<T> {
 
     protected final List<T> data;
+	private final Class<T> clazz;
 
-    public ListDataProvider(List<T> data) {
+    public ListDataProvider(List<T> data, Class<T> clazz) {
         this.data = data;
+        this.clazz = clazz;
+    }
+    
+    @Override
+    public Class<T> getHydraListItemType() {
+    	return clazz;
     }
 
     @Override

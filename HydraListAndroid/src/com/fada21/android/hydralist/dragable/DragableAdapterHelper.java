@@ -4,11 +4,11 @@ import static com.fada21.android.hydralist.util.HydraListConsts.UNSET;
 import android.content.Context;
 
 import com.fada21.android.hydralist.data.HydraListDataProvider;
-import com.fada21.android.hydralist.data.HydraListItem;
+import com.fada21.android.hydralist.dragable.interfaces.Dragable;
 import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 
-public class DragableAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
+public class DragableAdapterHelper<T extends Dragable> extends HydraListAdapterHelper<T> {
 
 	private final int dragableTouchResId;
 	private final int allowedRangeStartPosition;
@@ -57,7 +57,11 @@ public class DragableAdapterHelper<T extends HydraListItem> extends HydraListAda
 		}
 
 		if (!(dataProvider instanceof Swappable)) {
-			throw new IllegalStateException("Data provider must implement Dragable interface!");
+			throw new IllegalStateException("Data provider must implement Swapable interface!");
+		}
+		
+		if (! Dragable.class.isAssignableFrom(dataProvider.getHydraListItemType())) {
+			throw new IllegalStateException("Data provider items must implement Dragable interface!");
 		}
 	}
 

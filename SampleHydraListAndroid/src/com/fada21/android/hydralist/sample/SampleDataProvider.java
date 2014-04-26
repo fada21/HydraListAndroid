@@ -8,7 +8,7 @@ import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 public class SampleDataProvider extends ListDataProvider<SampleListItem> implements Swappable {
 
 	public SampleDataProvider(List<SampleListItem> data) {
-		super(data);
+		super(data, SampleListItem.class);
 	}
 
 	@Override
