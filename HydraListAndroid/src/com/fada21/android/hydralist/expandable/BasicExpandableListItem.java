@@ -16,7 +16,7 @@
 
 package com.fada21.android.hydralist.expandable;
 
-import com.fada21.android.hydralist.expandable.interfaces.Expandable;
+import com.fada21.android.hydralist.expandable.interfaces.ExpandableListItem;
 import com.fada21.android.hydralist.expandable.interfaces.OnSizeChangedListener;
 
 /**
@@ -28,7 +28,7 @@ import com.fada21.android.hydralist.expandable.interfaces.OnSizeChangedListener;
  * It should also state if item is expandable with method {@link #isExpandable()}.
  * </p>
  */
-public abstract class BasicExpandableListItem implements Expandable {
+public abstract class BasicExpandableListItem implements ExpandableListItem {
 
 	private int mCollapsedHeight;
 	private boolean mIsExpandable;

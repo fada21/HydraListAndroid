@@ -42,7 +42,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.fada21.android.hydralist.HydraListAdapter;
-import com.fada21.android.hydralist.dragable.interfaces.Dragable;
+import com.fada21.android.hydralist.dragable.interfaces.DragableListItem;
 import com.fada21.android.hydralist.dragable.interfaces.OnItemMovedListener;
 import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.util.PublicListView;
@@ -177,7 +177,7 @@ public class DragableListViewDelegate {
 	private boolean isDragable(int position) {
 		boolean isDragable = true;
 		try {
-			Dragable item = (Dragable) getAdapter().getItem(position);
+			DragableListItem item = (DragableListItem) getAdapter().getItem(position);
 			isDragable = item.isDragable();
 		} catch (ClassCastException cce) {
 			// assume that all items should be dragable

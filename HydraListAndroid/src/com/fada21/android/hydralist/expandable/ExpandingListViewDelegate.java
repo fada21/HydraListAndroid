@@ -33,7 +33,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import com.fada21.android.hydralist.HydraListAdapter;
-import com.fada21.android.hydralist.expandable.interfaces.Expandable;
+import com.fada21.android.hydralist.expandable.interfaces.ExpandableListItem;
 import com.fada21.android.hydralist.util.PublicListView;
 
 /**
@@ -55,8 +55,8 @@ public class ExpandingListViewDelegate {
 	}
 
 	@SuppressWarnings("unchecked")
-	public HydraListAdapter<Expandable> getExpandingAdapter() {
-		return (HydraListAdapter<Expandable>) nlv.getAdapter();
+	public HydraListAdapter<ExpandableListItem> getExpandingAdapter() {
+		return (HydraListAdapter<ExpandableListItem>) nlv.getAdapter();
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ExpandingListViewDelegate {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				@SuppressWarnings("unchecked")
-				Expandable item = (Expandable) nlv.getItemAtPosition(nlv.getPositionForView(view));
+				ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
 				if (item.isExpandable()) {
 					if (!item.isExpanded()) {
 						expandView(view, position, id);
@@ -182,8 +182,8 @@ public class ExpandingListViewDelegate {
 	 */
 	private void expandView(final View view, int position, long id) {
 		// final ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
-		HydraListAdapter<Expandable> expandingAdapter = getExpandingAdapter();
-		final Expandable item = expandingAdapter.getDataProvider().get(position);
+		HydraListAdapter<ExpandableListItem> expandingAdapter = getExpandingAdapter();
+		final ExpandableListItem item = expandingAdapter.getDataProvider().get(position);
 		ExpandingLayout expandingLayout = expandingAdapter.getExpandingHelper().getExpandedView(view, item);
 
 		/* Store the original top and bottom bounds of all the cells. */
@@ -377,7 +377,7 @@ public class ExpandingListViewDelegate {
 	 *            item id
 	 */
 	private void collapseView(final View view, int position, long id) {
-		final Expandable item = (Expandable) nlv.getItemAtPosition(nlv.getPositionForView(view));
+		final ExpandableListItem item = (ExpandableListItem) nlv.getItemAtPosition(nlv.getPositionForView(view));
 
 		/* Store the original top and bottom bounds of all the cells. */
 		final int oldTop = view.getTop();

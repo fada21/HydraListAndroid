@@ -10,9 +10,9 @@ import android.widget.ListView;
 import com.fada21.android.hydralist.data.HydraListDataProvider;
 import com.fada21.android.hydralist.data.HydraListItem;
 import com.fada21.android.hydralist.dragable.DragableAdapterHelper;
-import com.fada21.android.hydralist.dragable.interfaces.Dragable;
+import com.fada21.android.hydralist.dragable.interfaces.DragableListItem;
 import com.fada21.android.hydralist.expandable.ExpandingAdapterHelper;
-import com.fada21.android.hydralist.expandable.interfaces.Expandable;
+import com.fada21.android.hydralist.expandable.interfaces.ExpandableListItem;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 import com.fada21.android.hydralist.helper.PlainAdapterHelper;
 import com.fada21.android.hydralist.util.HydraListConsts;
@@ -39,8 +39,8 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 	protected final int itemLayout;
 
 	private final PlainAdapterHelper<T> plainAdapterHelper;
-	protected final ExpandingAdapterHelper<Expandable> expandingHelper;
-	protected final DragableAdapterHelper<Dragable> dragableHelper;
+	protected final ExpandingAdapterHelper<ExpandableListItem> expandingHelper;
+	protected final DragableAdapterHelper<DragableListItem> dragableHelper;
 
 	@SuppressWarnings("unchecked")
 	private HydraListAdapter(Builder<T> b) {
@@ -77,8 +77,8 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		private HydraListDataProvider<BT> dataProvider;
 
 		private PlainAdapterHelper<BT> baseAdapterHelper = null;
-		private ExpandingAdapterHelper<Expandable> expandingAdapterHelper = null;
-		private DragableAdapterHelper<Dragable> dragableAdapterHelper = null;
+		private ExpandingAdapterHelper<ExpandableListItem> expandingAdapterHelper = null;
+		private DragableAdapterHelper<DragableListItem> dragableAdapterHelper = null;
 
 		public Builder(PlainAdapterHelper<BT> helper) {
 			this.baseAdapterHelper = helper;
@@ -94,14 +94,14 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		}
 
 		@SuppressWarnings("unchecked")
-		public Builder<BT> expandable(ExpandingAdapterHelper<? extends Expandable> helper) {
-			expandingAdapterHelper = (ExpandingAdapterHelper<Expandable>) helper;
+		public Builder<BT> expandable(ExpandingAdapterHelper<? extends ExpandableListItem> helper) {
+			expandingAdapterHelper = (ExpandingAdapterHelper<ExpandableListItem>) helper;
 			return this;
 		}
 
 		@SuppressWarnings("unchecked")
-		public Builder<BT> dragable(DragableAdapterHelper<? extends Dragable> helper) {
-			dragableAdapterHelper = (DragableAdapterHelper<Dragable>) helper;
+		public Builder<BT> dragable(DragableAdapterHelper<? extends DragableListItem> helper) {
+			dragableAdapterHelper = (DragableAdapterHelper<DragableListItem>) helper;
 			return this;
 		}
 
@@ -123,7 +123,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		return expandingHelper != null;
 	}
 
-	public ExpandingAdapterHelper<Expandable> getExpandingHelper() {
+	public ExpandingAdapterHelper<ExpandableListItem> getExpandingHelper() {
 		return expandingHelper;
 	}
 
@@ -132,7 +132,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		return dragableHelper != null;
 	}
 
-	public DragableAdapterHelper<Dragable> getDragableHelper() {
+	public DragableAdapterHelper<DragableListItem> getDragableHelper() {
 		return dragableHelper;
 	}
 
@@ -207,7 +207,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 			if (isConvertViewNullAtFirst) {
 				expandingHelper.storeExpandableViewHolderAsTag(convertView);
 			}
-			expandingHelper.getExpandedView(convertView, (Expandable) data);
+			expandingHelper.getExpandedView(convertView, (ExpandableListItem) data);
 		}
 
 		//		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;

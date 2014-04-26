@@ -4,11 +4,11 @@ import android.content.Context;
 import android.view.View;
 
 import com.fada21.android.hydralist.data.HydraListDataProvider;
-import com.fada21.android.hydralist.expandable.interfaces.Expandable;
+import com.fada21.android.hydralist.expandable.interfaces.ExpandableListItem;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 import com.fada21.android.hydralist.util.HydraListConsts;
 
-public abstract class ExpandingAdapterHelper<T extends Expandable> extends HydraListAdapterHelper<T> {
+public abstract class ExpandingAdapterHelper<T extends ExpandableListItem> extends HydraListAdapterHelper<T> {
 
 	private final int expandingLayout;
 
@@ -32,7 +32,7 @@ public abstract class ExpandingAdapterHelper<T extends Expandable> extends Hydra
 			throw new IllegalStateException("Must provide resource id for expanding view (expandingLayoutResId)");
 		}
 		
-		if (! Expandable.class.isAssignableFrom(dataProvider.getHydraListItemType())) {
+		if (! ExpandableListItem.class.isAssignableFrom(dataProvider.getHydraListItemType())) {
 			throw new IllegalStateException("Data provider items must implement Expandable interface!");
 		}
 	}

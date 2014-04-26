@@ -3,7 +3,7 @@ package com.fada21.android.hydralist.expandable.interfaces;
 import com.fada21.android.hydralist.data.HydraListItem;
 
 
-public interface Expandable extends HydraListItem {
+public interface ExpandableListItem extends HydraListItem {
 
 	boolean isExpandable();
 	void setExpandable(boolean isExpandable);
