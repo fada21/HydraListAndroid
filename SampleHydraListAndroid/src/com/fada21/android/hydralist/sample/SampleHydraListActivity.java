@@ -60,7 +60,7 @@ public class SampleHydraListActivity extends Activity {
 
         SamplePlainAdapterHelper plainAdapterHelper = new SamplePlainAdapterHelper(this, R.layout.list_view_item);
         
-        Builder<SampleListItem> builder = HydraListAdapter.builder(plainAdapterHelper, SampleListItem.class);
+        Builder<SampleListItem> builder = HydraListAdapter.builder(plainAdapterHelper);
         builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
         builder.dragable(new DragableAdapterHelper<SampleListItem>(this, R.id.drag_hook));
         builder.data(new SampleDataProvider(mData));

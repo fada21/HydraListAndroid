@@ -132,7 +132,7 @@ public class DragableListViewDelegate {
 		return new AdapterView.OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				if (mDragableTouchResId == 0) {
+				if (mDragableTouchResId == UNSET) {
 					mIsTouchedDragableView = true;
 					mCellIsMobile = makeCellMobile();
 					return mCellIsMobile;
@@ -304,7 +304,7 @@ public class DragableListViewDelegate {
 			mActivePointerId = event.getPointerId(0);
 
 			mIsTouchedDragableView = false;
-			if (mDragableTouchResId != 0) {
+			if (mDragableTouchResId != UNSET) {
 				mIsParentHorizontalScrollContainer = false;
 
 				int position = nlv.pointToPosition(mDownX, mDownY);
@@ -596,7 +596,7 @@ public class DragableListViewDelegate {
 	}
 
 	public void setIsParentHorizontalScrollContainer(boolean isParentHorizontalScrollContainer) {
-		mIsParentHorizontalScrollContainer = (mDragableTouchResId == 0) && isParentHorizontalScrollContainer;
+		mIsParentHorizontalScrollContainer = (mDragableTouchResId == UNSET) && isParentHorizontalScrollContainer;
 	}
 
 	public boolean isParentHorizontalScrollContainer() {
@@ -605,7 +605,7 @@ public class DragableListViewDelegate {
 
 	public void setDragableTouchResId(int resId) {
 		mDragableTouchResId = resId;
-		if (resId != 0) {
+		if (resId != UNSET) {
 			setIsParentHorizontalScrollContainer(false);
 		}
 	}

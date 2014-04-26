@@ -14,9 +14,9 @@ public class DragableAdapterHelper<T extends Dragable> extends HydraListAdapterH
 	private final int allowedRangeStartPosition;
 	private final int allowedRangeEndPosition;
 
-	public DragableAdapterHelper(Context context, Class<T> clazz) {
+	public DragableAdapterHelper(Context context) {
 		super(context);
-		dragableTouchResId = 0;
+		dragableTouchResId = UNSET;
 		this.allowedRangeStartPosition = UNSET;
 		this.allowedRangeEndPosition = UNSET;
 	}

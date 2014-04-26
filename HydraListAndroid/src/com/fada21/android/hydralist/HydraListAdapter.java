@@ -52,7 +52,8 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		expandingHelper = b.expandingAdapterHelper;
 		dragableHelper = b.dragableAdapterHelper;
 
-		ensureCompliance((HydraListAdapterHelper<T>)plainAdapterHelper, (HydraListAdapterHelper<T>)expandingHelper, (HydraListAdapterHelper<T>)dragableHelper);
+		ensureCompliance((HydraListAdapterHelper<T>) plainAdapterHelper, (HydraListAdapterHelper<T>) expandingHelper,
+				(HydraListAdapterHelper<T>) dragableHelper);
 	}
 
 	/**
@@ -67,7 +68,7 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 	 *            only for parameterization
 	 * @return HydraBuilder for constructing HydraList Adapter
 	 */
-	public static <BT extends HydraListItem> Builder<BT> builder(PlainAdapterHelper<BT> baseAdapterHelper, Class<BT> clazz) {
+	public static <BT extends HydraListItem> Builder<BT> builder(PlainAdapterHelper<BT> baseAdapterHelper) {
 		return new Builder<BT>(baseAdapterHelper);
 	}
 
@@ -187,32 +188,31 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 	}
 
 	/*
-	 * Standard getView method
-	 *  very important or new plugins(non-Javadoc)
+	 * Standard getView method. It's very important for new plugins to change it wisely.
+	 * 
 	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
 	 */
-	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final T data = dataProvider.get(position);
 
 		boolean isConvertViewNullAtFirst = convertView == null;
-		
+
 		if (isConvertViewNullAtFirst) {
 			convertView = plainAdapterHelper.newView(parent);
 		}
 		plainAdapterHelper.setupPlainView(convertView, data);
-		
+
 		if (isExpandable()) {
 			if (isConvertViewNullAtFirst) {
 				expandingHelper.storeExpandableViewHolderAsTag(convertView);
 			}
-			expandingHelper.getExpandedView(convertView, (Expandable)data);
-		} 
+			expandingHelper.getExpandedView(convertView, (Expandable) data);
+		}
 
-//		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
-//		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
-//		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
+		//		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
+		//		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
+		//		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
 
 		return convertView;
 	}
