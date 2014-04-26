@@ -126,7 +126,7 @@ public class ExpandingListViewDelegate {
 			int allowedToShinkTop = (int) (offset * pixelsConvertion);
 			int allowedToShinkBottom = (int) ((range - offset - extent) * pixelsConvertion);
 			boolean isCollapsingBelowBottom = isListFilled && yTranslateBottom > allowedToShinkBottom;
-			boolean isCellCompletelyDisappearing = bottom - yDelta - yTranslateBottom < 0;
+			boolean isCellCompletelyDisappearing = bottom - yTranslateBottom < 0;
 
 			if (isCollapsingBelowBottom) {
 				yTranslateTop = Math.min(allowedToShinkTop, yTranslateBottom);

@@ -40,7 +40,7 @@ import com.fada21.android.hydralist.dragable.DragableAdapterHelper;
  */
 public class SampleHydraListActivity extends Activity {
 
-    private final int     NUM_OF_CELLS = 22;
+    private final int     NUM_OF_CELLS = 34;
 
     private HydraListView mListView;
 
