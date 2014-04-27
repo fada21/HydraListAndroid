@@ -420,7 +420,6 @@ public class DragableListViewDelegate {
 			if (positionForView < nlv.getHeaderViewsCount()) {
 				return;
 			}
-			swapElements(originalItem, positionForView);
 
 			BaseAdapter adapter;
 			if (getAdapter() instanceof HeaderViewListAdapter) {
@@ -428,7 +427,7 @@ public class DragableListViewDelegate {
 			} else {
 				adapter = (BaseAdapter) getAdapter();
 			}
-			adapter.notifyDataSetChanged();
+			swapElements(originalItem, positionForView);
 
 			mDownY = mLastEventY;
 			mDownX = mLastEventX;
