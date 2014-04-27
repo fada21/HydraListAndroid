@@ -14,9 +14,12 @@ Hydra - many headed creature from ancient greek mythology. But in my case I had 
 =====================
 
 TODO
- - license issues - contact with Daniel Olshansky
+ - license issues - contact with Daniel Olshansky 
+ - license issues - contact with Niek Haarman (https://github.com/nhaarman/ListViewAnimations)
  - sticky headers 
- - better samples
- - writing library expansion tutorial
+ - better samples 
+ - writing library expansion tutorial 
  - tests
  - animated item delete
+ - gradle config
+ - maven repo
