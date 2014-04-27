@@ -36,15 +36,15 @@ public class CustomExpandingAdapterHelper extends ExpandingAdapterHelper<SampleL
 
     @Override
     protected void setupExpandedView(View convertView, final SampleListItem data) {
-        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_image_view);
+        ImageView expImgView = (ImageView) convertView.findViewById(R.id.exp_icon);
         expImgView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Details of '" + data.getSc().getName() + " " + data.getNumber() + "'", Toast.LENGTH_SHORT).show();
             }
         });
-        TextView textView = (TextView) convertView.findViewById(R.id.text_view);
+        TextView textView = (TextView) convertView.findViewById(R.id.exp_details);
 
         expImgView.setImageResource(data.getSc().getIconResId());
         textView.setText(context.getString(data.getSc().getTextResId()));

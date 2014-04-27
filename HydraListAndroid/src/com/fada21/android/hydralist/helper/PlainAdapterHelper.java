@@ -63,7 +63,7 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 		return newView;
 	}
 
-	private boolean hasViewHolderClass() {
+	public boolean hasViewHolderClass() {
 		return viewHolderClass != null;
 	}
 

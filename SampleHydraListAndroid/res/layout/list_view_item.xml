@@ -11,7 +11,7 @@
         android:orientation="horizontal" >
 
         <ImageView
-            android:id="@+id/image_view"
+            android:id="@+id/main_icon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -27,7 +27,7 @@
             android:src="@drawable/unburrow_drag_hook" />
 
         <TextView
-            android:id="@+id/title_view"
+            android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
@@ -42,7 +42,7 @@
         android:visibility="gone" >
 
         <ImageView
-            android:id="@+id/exp_image_view"
+            android:id="@+id/exp_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
@@ -50,11 +50,11 @@
             android:scaleType="center" />
         
         <TextView
-            android:id="@+id/text_view"
+            android:id="@+id/exp_details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_toLeftOf="@id/exp_image_view"
+            android:layout_toLeftOf="@id/exp_icon"
             android:layout_centerInParent="true"
             android:paddingBottom="20dp"
             android:paddingLeft="20dp"

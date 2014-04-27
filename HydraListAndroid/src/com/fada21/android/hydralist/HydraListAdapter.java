@@ -14,6 +14,7 @@ import com.fada21.android.hydralist.dragable.interfaces.DragableListItem;
 import com.fada21.android.hydralist.expandable.ExpandingAdapterHelper;
 import com.fada21.android.hydralist.expandable.interfaces.ExpandableListItem;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
+import com.fada21.android.hydralist.helper.HydraListViewHolder;
 import com.fada21.android.hydralist.helper.PlainAdapterHelper;
 import com.fada21.android.hydralist.util.HydraListConsts;
 
@@ -201,7 +202,11 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		if (isConvertViewNullAtFirst) {
 			convertView = plainAdapterHelper.newView(parent);
 		}
-		plainAdapterHelper.setupPlainView(convertView, data);
+		if (plainAdapterHelper.hasViewHolderClass()) {
+			plainAdapterHelper.bindView((HydraListViewHolder) convertView.getTag(itemLayout), data);
+		} else {
+			plainAdapterHelper.setupPlainView(convertView, data);
+		}
 
 		if (isExpandable()) {
 			if (isConvertViewNullAtFirst) {

@@ -1,7 +1,5 @@
 package com.fada21.android.hydralist.sample;
 
-import com.fada21.android.hydralist.helper.HydraListViewHolder;
-
 import android.content.Context;
 import android.view.View;
 import android.widget.AbsListView;
@@ -10,10 +8,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SamplePlainAdapterHelper extends com.fada21.android.hydralist.helper.PlainAdapterHelper<SampleListItem> {
+import com.fada21.android.hydralist.helper.HydraListViewHolder;
+import com.fada21.android.hydralist.helper.PlainAdapterHelper;
 
-	public SamplePlainAdapterHelper(Context ctx, int itemLayout) {
-		super(ctx, itemLayout);
+public class SamplePlainAdapterHelper extends PlainAdapterHelper<SampleListItem> {
+
+	public SamplePlainAdapterHelper(Context ctx) {
+		super(ctx, R.layout.list_view_item, SampleViewHolder.class);
 	}
 
 	@Override
@@ -22,8 +23,9 @@ public class SamplePlainAdapterHelper extends com.fada21.android.hydralist.helpe
 		LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
 		linearLayout.setLayoutParams(linearLayoutParams);
 
-		TextView titleView = (TextView) convertView.findViewById(R.id.title_view);
-		ImageView imgView = (ImageView) convertView.findViewById(R.id.image_view);
+		TextView titleView = (TextView) convertView.findViewById(R.id.title);
+		ImageView imgView = (ImageView) convertView.findViewById(R.id.main_icon);
+		imgView.setImageResource(data.getSc().getIconResId());
 		imgView.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -33,13 +35,24 @@ public class SamplePlainAdapterHelper extends com.fada21.android.hydralist.helpe
 		});
 
 		titleView.setText(data.getSc().getName() + " " + data.getNumber());
-		imgView.setImageResource(data.getSc().getIconResId());
 	}
 
 	@Override
 	public void bindView(HydraListViewHolder viewHolder, SampleListItem data) {
-		// TODO Auto-generated method stub
-		
+		SampleViewHolder svh = (SampleViewHolder) viewHolder;
+		svh.mainIcon.setImageResource(data.getSc().getIconResId());
+		svh.mainIcon.setOnClickListener(setupOnClickListener(data));
+
+		svh.title.setText(data.getSc().getName() + " " + data.getNumber());
 	}
 
+	private View.OnClickListener setupOnClickListener(final SampleListItem data) {
+		return new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(context, data.getSc().getName() + " " + data.getNumber(), Toast.LENGTH_SHORT).show();
+			}
+		};
+	}
 }
