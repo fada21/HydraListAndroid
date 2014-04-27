@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import com.fada21.android.hydralist.HydraListAdapter;
@@ -28,46 +29,44 @@ import com.fada21.android.hydralist.HydraListView;
 import com.fada21.android.hydralist.dragable.DragableAdapterHelper;
 
 /**
- * This activity creates a listview whose items can be clicked to expand and show
- * additional content.
+ * This activity creates a listview whose items can be clicked to expand and show additional content.
  * 
- * In this specific demo, each item in a listview displays an image and a corresponding
- * title. These two items are centered in the default (collapsed) state of the listview's
- * item. When the item is clicked, it expands to display text of some varying length.
- * The item persists in this expanded state (even if the user scrolls away and then scrolls
- * back to the same location) until it is clicked again, at which point the cell collapses
- * back to its default state.
+ * In this specific demo, each item in a listview displays an image and a corresponding title. These two items are centered in the default (collapsed) state of
+ * the listview's item. When the item is clicked, it expands to display text of some varying length. The item persists in this expanded state (even if the user
+ * scrolls away and then scrolls back to the same location) until it is clicked again, at which point the cell collapses back to its default state.
  */
 public class SampleHydraListActivity extends Activity {
 
-    private final int     NUM_OF_CELLS = 34;
+	private final int NUM_OF_CELLS = 34;
 
-    private HydraListView mListView;
+	private HydraListView mListView;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        SampleContents[] sampleContents = SampleContents.values();
+		SampleContents[] sampleContents = SampleContents.values();
 
-        List<SampleListItem> mData = new ArrayList<SampleListItem>();
+		List<SampleListItem> mData = new ArrayList<SampleListItem>();
 
-        for (int i = 0; i < NUM_OF_CELLS; i++) {
-            SampleContents sc = sampleContents[i % sampleContents.length];
-            mData.add(new SampleListItem(sc, i + 1));
-        }
+		Resources res = getResources();
+		for (int i = 0; i < NUM_OF_CELLS; i++) {
+			SampleContents sc = sampleContents[i % sampleContents.length];
+			mData.add(new SampleListItem(sc, (int) res.getDimension(sc.getDefHeightResId()), i + 1));
+		}
 
-        SamplePlainAdapterHelper plainAdapterHelper = new SamplePlainAdapterHelper(this);
-        
-        Builder<SampleListItem> builder = HydraListAdapter.builder(plainAdapterHelper);
-        builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
-        builder.dragable(new DragableAdapterHelper<SampleListItem>(this, R.id.drag_hook));
-        builder.data(new SampleDataProvider(mData));
-        HydraListAdapter<SampleListItem> hydraListAdapter = builder.build();
+		SamplePlainAdapterHelper plainAdapterHelper = new SamplePlainAdapterHelper(this);
 
-        mListView = (HydraListView) findViewById(R.id.main_list_view);
-        mListView.setAdapter(hydraListAdapter);
-        mListView.setDivider(null);
-    }
+		Builder<SampleListItem> builder = HydraListAdapter.builder(plainAdapterHelper);
+		builder.data(new SampleDataProvider(mData));
+
+		builder.expandable(new CustomExpandingAdapterHelper(this, R.id.expanding_layout));
+		builder.dragable(new DragableAdapterHelper<SampleListItem>(this, R.id.drag_hook));
+		HydraListAdapter<SampleListItem> hydraListAdapter = builder.build();
+
+		mListView = (HydraListView) findViewById(R.id.main_list_view);
+		mListView.setAdapter(hydraListAdapter);
+		//mListView.setDivider(null);
+	}
 }

@@ -215,9 +215,9 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 			expandingHelper.getExpandedView(convertView, (ExpandableListItem) data);
 		}
 
-		//		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
-		//		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
-		//		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
+		int layout_width = AbsListView.LayoutParams.MATCH_PARENT;
+		int layout_height = AbsListView.LayoutParams.WRAP_CONTENT;
+		convertView.setLayoutParams(new ListView.LayoutParams(layout_width, layout_height));
 
 		return convertView;
 	}

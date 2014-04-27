@@ -17,9 +17,9 @@
 <resources>
 
     <string name="app_name">HydraListAndroid</string>
-    <string name="short_lorem_ipsum">The Hydralisk is easily the most versatile breed for the Zerg.</string>
-    <string name="medium_lorem_ipsum">Marines are the first line of defense for many of the Terran colonies. Outfitted with Powered Combat Suits, Marines are afforded full life-support, NBC shielding, and in-field chemical delivery systems. The standard-issue C-14 "Impaler" Gauss Rifle provides even a single soldier with extreme firepower.</string>
-    <string name="long_lorem_ipsum">The heart and soul of the Protoss military are the fierce Zealots who have sworn their lives to the defense of Aiur. Through the path of the Khala, they learn to hone their innate battle rage to a fine edge. The power suits worn by Zealots enhance and channel their already formidable Psionic abilities, allowing them to form a protective shield around themselves and project massive energy blades from their forearms. Even a handful of these dedicated warriors can easily control an entire colony of other, lesser species, as they are capable of tearing through armored structures and vehicles alike.</string>
+    <string name="hydralisk_details">The Hydralisk is easily the most versatile breed for the Zerg.</string>
+    <string name="marine_details">Marines are the first line of defense for many of the Terran colonies. Outfitted with Powered Combat Suits, Marines are afforded full life-support, NBC shielding, and in-field chemical delivery systems. The standard-issue C-14 "Impaler" Gauss Rifle provides even a single soldier with extreme firepower.</string>
+    <string name="zealot_details">The heart and soul of the Protoss military are the fierce Zealots who have sworn their lives to the defense of Aiur. Through the path of the Khala, they learn to hone their innate battle rage to a fine edge. The power suits worn by Zealots enhance and channel their already formidable Psionic abilities, allowing them to form a protective shield around themselves and project massive energy blades from their forearms. Even a handful of these dedicated warriors can easily control an entire colony of other, lesser species, as they are capable of tearing through armored structures and vehicles alike.</string>
 
     <string-array name="units_urls">
         <item>http://starcraft.wikia.com/wiki/Hydralisk_(StarCraft)</item>

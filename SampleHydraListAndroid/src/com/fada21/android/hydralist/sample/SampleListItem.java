@@ -8,8 +8,8 @@ public class SampleListItem extends BasicExpandableListItem implements DragableL
 	private SampleContents sc;
 	private int number;
 
-	public SampleListItem(SampleContents sc, int number) {
-		super(sc.getDefHeight(), sc.isSampleExpandable());
+	public SampleListItem(SampleContents sc, int defaultItemHeight, int number) {
+		super(defaultItemHeight, sc.isSampleExpandable());
 		this.sc = sc;
 		this.number = number;
 	}
