@@ -1,5 +1,7 @@
 package com.fada21.android.hydralist.sample;
 
+import com.fada21.android.hydralist.helper.HydraListViewHolder;
+
 import android.content.Context;
 import android.view.View;
 import android.widget.AbsListView;
@@ -32,6 +34,12 @@ public class SamplePlainAdapterHelper extends com.fada21.android.hydralist.helpe
 
 		titleView.setText(data.getSc().getName() + " " + data.getNumber());
 		imgView.setImageResource(data.getSc().getIconResId());
+	}
+
+	@Override
+	public void bindView(HydraListViewHolder viewHolder, SampleListItem data) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

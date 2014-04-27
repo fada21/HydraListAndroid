@@ -1,26 +1,41 @@
 package com.fada21.android.hydralist.helper;
 
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fada21.android.hydralist.BuildConfig;
 import com.fada21.android.hydralist.data.HydraListDataProvider;
 import com.fada21.android.hydralist.data.HydraListItem;
 import com.fada21.android.hydralist.util.HydraListConsts;
+import com.fada21.android.hydralist.util.HydraListUtils;
 
 /**
  * Plain adapter that servers common adapter tasks besides of expansion adapter helpers
  */
 public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraListAdapterHelper<T> {
 
+	public static final String TAG = "PlainAdapterHelper";
+
 	private final int itemLayout;
 	private final LayoutInflater inflater;
+	private final Class<? extends HydraListViewHolder> viewHolderClass;
 
 	public PlainAdapterHelper(Context ctx, int itemLayout) {
 		super(ctx);
 		inflater = LayoutInflater.from(context);
 		this.itemLayout = itemLayout;
+		this.viewHolderClass = null;
+	}
+
+	public PlainAdapterHelper(Context ctx, int itemLayout, Class<? extends HydraListViewHolder> viewHolderClass) {
+		super(ctx);
+		inflater = LayoutInflater.from(context);
+		this.itemLayout = itemLayout;
+		this.viewHolderClass = viewHolderClass;
 	}
 
 	/**
@@ -40,8 +55,54 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 		}
 	}
 
-	/**
-	 * Setups plain view of a list item (regular non expanded or non expandable view)
+	public View newView(ViewGroup parent) {
+		View newView = inflater.inflate(itemLayout, parent, false);
+		if (hasViewHolderClass()) {
+			newView.setTag(itemLayout, createViewHolder(newView));
+		}
+		return newView;
+	}
+
+	private boolean hasViewHolderClass() {
+		return viewHolderClass != null;
+	}
+
+	private HydraListViewHolder createViewHolder(View viewWithoutTag) {
+		HydraListViewHolder viewHolder = null;
+		try {
+			viewHolder = (HydraListViewHolder) viewHolderClass.newInstance();
+			viewHolder.initViewHolder(viewWithoutTag);
+		} catch (InstantiationException e) {
+			HydraListUtils.logd(TAG, "Error during viewHolder instantiation! There won't be any viewHolder", e);
+		} catch (IllegalAccessException e) {
+			HydraListUtils.logd(TAG, "Error during viewHolder instantiation! There won't be any viewHolder either. No f*cking way!", e);
+		}
+		return viewHolder;
+	}
+
+/**
+	 * <p>
+	 * Setups plain view of a list item.
+	 * </p><p>
+	 * This method or {@link #setupPlainView(View, HydraListItem) should be implemented. 
+	 * It depends on whether user supplied ViewHolder class.
+	 * If there is several view types it may be not easy to use view holder.
+	 * </p>
+	 * 
+	 * @param viewHolder
+	 *            viewHolder to bind
+	 * @param data
+	 *            to be filled
+	 */
+	public abstract void bindView(HydraListViewHolder viewHolder, T data);
+
+/**
+	 * <p>
+	 * Setups plain view of a list item.
+	 * </p><p>
+	 * This method or {@link #bindView(HydraListViewHolder, HydraListItem) should be implemented. 
+	 * It depends on whether user supplied ViewHolder class.
+	 * </p>
 	 * 
 	 * @param convertView
 	 *            view to alter
@@ -49,9 +110,5 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 	 *            to be filled
 	 */
 	public abstract void setupPlainView(View convertView, T data);
-
-	public View newView(ViewGroup parent) {
-		return inflater.inflate(itemLayout, parent, false);
-	}
 
 }
