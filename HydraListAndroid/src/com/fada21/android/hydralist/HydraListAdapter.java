@@ -198,14 +198,20 @@ public final class HydraListAdapter<T extends HydraListItem> extends BaseAdapter
 		final T data = dataProvider.get(position);
 
 		boolean isConvertViewNullAtFirst = convertView == null;
+		boolean doAlwaysRecreateConvertView = plainAdapterHelper.getItemLayout() == HydraListConsts.UNSET;
 
-		if (isConvertViewNullAtFirst) {
-			convertView = plainAdapterHelper.newView(parent);
-		}
-		if (plainAdapterHelper.hasViewHolderClass()) {
-			plainAdapterHelper.bindView((HydraListViewHolder) convertView.getTag(itemLayout), data);
+		if (!doAlwaysRecreateConvertView) {
+
+			if (isConvertViewNullAtFirst) {
+				convertView = plainAdapterHelper.newView(parent);
+			}
+			if (plainAdapterHelper.hasViewHolderClass()) {
+				plainAdapterHelper.bindView((HydraListViewHolder) convertView.getTag(itemLayout), data);
+			} else {
+				plainAdapterHelper.setupPlainView(parent, convertView, data);
+			}
 		} else {
-			plainAdapterHelper.setupPlainView(convertView, data);
+			plainAdapterHelper.setupPlainView(parent, null, data);
 		}
 
 		if (isExpandable()) {

@@ -1,13 +1,10 @@
 package com.fada21.android.hydralist.helper;
 
 import android.content.Context;
-import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fada21.android.hydralist.BuildConfig;
 import com.fada21.android.hydralist.data.HydraListDataProvider;
 import com.fada21.android.hydralist.data.HydraListItem;
 import com.fada21.android.hydralist.util.HydraListConsts;
@@ -21,9 +18,16 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 	public static final String TAG = "PlainAdapterHelper";
 
 	private final int itemLayout;
-	private final LayoutInflater inflater;
+	protected final LayoutInflater inflater;
 	private final Class<? extends HydraListViewHolder> viewHolderClass;
 
+	/**
+	 * Constructor with viewHolder support disabled;
+	 * 
+	 * @param ctx
+	 * @param itemLayout
+	 *            list item layour; pass {@link HydraListConsts#UNSET} to force always running setupPlainView with new convertView
+	 */
 	public PlainAdapterHelper(Context ctx, int itemLayout) {
 		super(ctx);
 		inflater = LayoutInflater.from(context);
@@ -31,6 +35,13 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 		this.viewHolderClass = null;
 	}
 
+	/**
+	 * Constructor with viewHolder support enabled;
+	 * 
+	 * @param ctx
+	 * @param itemLayout
+	 *            list item layour; pass {@link HydraListConsts#UNSET} to force running setupPlainView with always recreated convertView
+	 */
 	public PlainAdapterHelper(Context ctx, int itemLayout, Class<? extends HydraListViewHolder> viewHolderClass) {
 		super(ctx);
 		inflater = LayoutInflater.from(context);
@@ -105,10 +116,10 @@ public abstract class PlainAdapterHelper<T extends HydraListItem> extends HydraL
 	 * </p>
 	 * 
 	 * @param convertView
-	 *            view to alter
+	 *            view to alter, may be null ifn unset layout was provided in constructor
 	 * @param data
 	 *            to be filled
 	 */
-	public abstract void setupPlainView(View convertView, T data);
+	public abstract void setupPlainView(ViewGroup parent, View convertView, T data);
 
 }

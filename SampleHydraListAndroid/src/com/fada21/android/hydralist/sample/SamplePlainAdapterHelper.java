@@ -2,6 +2,7 @@ package com.fada21.android.hydralist.sample;
 
 import android.content.Context;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,7 +19,7 @@ public class SamplePlainAdapterHelper extends PlainAdapterHelper<SampleListItem>
 	}
 
 	@Override
-	public void setupPlainView(View convertView, final SampleListItem data) {
+	public void setupPlainView(ViewGroup parent, View convertView, final SampleListItem data) {
 		LinearLayout linearLayout = (LinearLayout) (convertView.findViewById(R.id.collapsed_layout));
 		LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
 		linearLayout.setLayoutParams(linearLayoutParams);
@@ -40,6 +41,8 @@ public class SamplePlainAdapterHelper extends PlainAdapterHelper<SampleListItem>
 	@Override
 	public void bindView(HydraListViewHolder viewHolder, SampleListItem data) {
 		SampleViewHolder svh = (SampleViewHolder) viewHolder;
+		LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, data.getCollapsedHeight());
+		svh.collapsedView.setLayoutParams(linearLayoutParams);
 		svh.mainIcon.setImageResource(data.getSc().getIconResId());
 		svh.mainIcon.setOnClickListener(setupOnClickListener(data));
 
