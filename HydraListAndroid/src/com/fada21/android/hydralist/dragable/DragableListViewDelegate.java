@@ -528,6 +528,9 @@ public class DragableListViewDelegate {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
+                    final long toReportAboveId = mAboveItemId;
+                    final long toReportMovedId = mMobileItemId;
+                    final long toReportBelowId = mBelowItemId;
 					mAboveItemId = INVALID_ID;
 					mMobileItemId = INVALID_ID;
 					mBelowItemId = INVALID_ID;
@@ -536,8 +539,8 @@ public class DragableListViewDelegate {
 					nlv.setEnabled(true);
 					nlv.invalidate();
 					if (mOnItemMovedListener != null) {
-						mOnItemMovedListener.onItemMoved(mLastMovedToIndex - nlv.getHeaderViewsCount());
-					}
+                        mOnItemMovedListener.onItemMoved(toReportMovedId, toReportAboveId, toReportBelowId);
+                    }
 				}
 			});
 			hoverViewAnimator.start();

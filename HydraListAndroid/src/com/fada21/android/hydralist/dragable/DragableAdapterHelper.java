@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.fada21.android.hydralist.data.HydraListDataProvider;
 import com.fada21.android.hydralist.dragable.interfaces.DragableListItem;
+import com.fada21.android.hydralist.dragable.interfaces.OnItemMovedListener;
 import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.helper.HydraListAdapterHelper;
 
@@ -13,6 +14,8 @@ public class DragableAdapterHelper<T extends DragableListItem> extends HydraList
 	private final int dragableTouchResId;
 	private final int allowedRangeStartPosition;
 	private final int allowedRangeEndPosition;
+
+    private OnItemMovedListener onItemMovedListener;
 
 	public DragableAdapterHelper(Context context) {
 		super(context);
@@ -68,4 +71,12 @@ public class DragableAdapterHelper<T extends DragableListItem> extends HydraList
 	public int getDragableTouchResId() {
 		return dragableTouchResId;
 	}
+
+    public void setOnItemMovedListener(OnItemMovedListener onItemMovedListener) {
+        this.onItemMovedListener = onItemMovedListener;
+    }
+
+    public OnItemMovedListener getOnItemMovedListener() {
+        return onItemMovedListener;
+    }
 }
