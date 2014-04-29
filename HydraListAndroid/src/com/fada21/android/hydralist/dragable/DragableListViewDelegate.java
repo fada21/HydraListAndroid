@@ -16,21 +16,28 @@
 
 package com.fada21.android.hydralist.dragable;
 
+import static com.fada21.android.hydralist.dragable.DragableConsts.INVALID_POINTER_ID;
+import static com.fada21.android.hydralist.dragable.DragableConsts.INVALID_POSITION;
+import static com.fada21.android.hydralist.dragable.DragableConsts.MOVE_DURATION;
+import static com.fada21.android.hydralist.dragable.DragableConsts.SMOOTH_SCROLL_AMOUNT_AT_EDGE;
+import static com.fada21.android.hydralist.util.HydraListConsts.INVALID_ID;
+import static com.fada21.android.hydralist.util.HydraListConsts.UNSET;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
@@ -46,8 +53,6 @@ import com.fada21.android.hydralist.dragable.interfaces.DragableListItem;
 import com.fada21.android.hydralist.dragable.interfaces.OnItemMovedListener;
 import com.fada21.android.hydralist.dragable.interfaces.Swappable;
 import com.fada21.android.hydralist.util.PublicListView;
-
-import static com.fada21.android.hydralist.dragable.DragableConsts.*;
 
 /**
  * The dragable listview is an extension of listview that supports cell dragging and swapping.
@@ -435,7 +440,6 @@ public class DragableListViewDelegate {
 			final int switchViewStartTop = switchView.getTop();
 
 			mobileView.setVisibility(View.VISIBLE);
-			switchView.setVisibility(View.INVISIBLE);
 
 			updateNeighborViewsForId(mMobileItemId);
 
@@ -460,6 +464,19 @@ public class DragableListViewDelegate {
 					return true;
 				}
 			});
+            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                @SuppressWarnings("deprecation")
+                @SuppressLint("NewApi")
+                public void onGlobalLayout() {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                        observer.removeGlobalOnLayoutListener(this);
+                    } else {
+                        observer.removeOnGlobalLayoutListener(this);
+                    }
+                    getViewForId(mMobileItemId).setVisibility(View.INVISIBLE);
+                }
+            });
 		}
 	}
 
