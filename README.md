@@ -1,5 +1,9 @@
 HydraListAndroid
 =====================
+##@Deprecated
+Unmantained and won't be. RecyclerView is now available. Here is good article how to switch: http://andraskindler.com/2014/11/22/migrating-to-recyclerview/
+
+=====================
 
 Listview for Android that can incorporate behavior of:
 
